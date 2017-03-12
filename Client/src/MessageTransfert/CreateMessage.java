@@ -58,30 +58,13 @@ public class CreateMessage {
         mBytes = cryptage.crypt();
         return mBytes;
     }
-    private SecretKey generateKey(int size) {
-        try {
-            KeyGenerator keyGen = KeyGenerator.getInstance("AES");
-            keyGen.init(size);
-            SecretKey secretKey = keyGen.generateKey();
-            return secretKey;
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(CreateMessage.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
-    }
     
-    public Message creation(int value){
-        if (value == 5) {
-            next = chooseNodes();
-            for (int i=1; i<4; i++) 
-                next.get(i).setSecret(generateKey(256));
-            // TO DO : send keys to nodes
-        }
+    public Message creation(){
+        next = chooseNodes();
         byte[] mbytes = message.getBytes();
         for (int i=0; i < 4; i++) {
             Node n1 = next.get(i-1);
             Node n2 = next.get(i);
-            n1.setSecret(null); n2.setSecret(null);
             mbytes = encrypt(mbytes,n1,n2);
         } 
         return new Message(mbytes, next.get(3));

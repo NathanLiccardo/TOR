@@ -29,9 +29,7 @@ public class SendingMessage{
     
     public void createMessage(String msg) {
         create.setMessage(msg);
-        message = create.creation(counter);
-        counter--;
-        if (counter == 0) counter = 5;
+        message = create.creation();
     }
     public void startThreads() {
         Thread t = new Thread(new Send(message));
@@ -46,7 +44,6 @@ public class SendingMessage{
     }
 }
 
-// TO DO : envoyer les clés tous les 5 messages !
 class Send implements Runnable {
     
     private Node node;
