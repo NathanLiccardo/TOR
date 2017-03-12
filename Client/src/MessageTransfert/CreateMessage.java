@@ -8,13 +8,10 @@ package MessageTransfert;
 import Cryptography.CryptMessage;
 import Node.Node;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
 /**
  *
  * @author Nathan
@@ -62,7 +59,7 @@ public class CreateMessage {
     public Message creation(){
         next = chooseNodes();
         byte[] mbytes = message.getBytes();
-        for (int i=0; i < 4; i++) {
+        for (int i=1; i < 4; i++) {
             Node n1 = next.get(i-1);
             Node n2 = next.get(i);
             mbytes = encrypt(mbytes,n1,n2);
