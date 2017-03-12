@@ -9,7 +9,6 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.security.Key;
-import javax.crypto.SecretKey;
 
 /**
  *
@@ -19,7 +18,6 @@ public class Node implements Serializable{
     InetAddress ip = null;
     Integer port = null;
     Key key;
-    SecretKey secret = null;
     
     public Node(InetAddress ipAddress, Integer p) {
         ip = ipAddress;
@@ -40,10 +38,6 @@ public class Node implements Serializable{
         port = p;
     }
     
-    public void setSecret(SecretKey s){
-        secret = s;
-    }
-    
     public InetAddress getIp(){
         return ip;
     }
@@ -54,10 +48,6 @@ public class Node implements Serializable{
     
     public Key getKey() {
         return key;
-    }
-    
-    public SecretKey getSecret() {
-        return secret;
     }
     
 }

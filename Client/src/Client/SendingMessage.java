@@ -39,7 +39,6 @@ public class SendingMessage{
     public SendingMessage(Node c,ArrayList<Node> n) {
         client = c;
         nodes = n;
-        counter = 5;
         create = new CreateMessage(client,nodes);
     }
 }

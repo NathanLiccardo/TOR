@@ -8,7 +8,6 @@ package MessageTransfert;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
-import java.security.Key;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,15 +45,6 @@ public class ReceiveMessage {
             Message val;
             val = (Message) input.readObject();
             return val;
-        } catch (IOException | ClassNotFoundException ex) {
-            Logger.getLogger(ReceiveMessage.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
-    }
-    
-    public Key receiveKey() {
-        try {
-            return (Key) input.readObject();
         } catch (IOException | ClassNotFoundException ex) {
             Logger.getLogger(ReceiveMessage.class.getName()).log(Level.SEVERE, null, ex);
         }
