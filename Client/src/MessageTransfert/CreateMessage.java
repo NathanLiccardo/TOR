@@ -1,0 +1,100 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package MessageTransfert;
+
+import Cryptography.CryptMessage;
+import Node.Node;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+/**
+ *
+ * @author Nathan
+ */
+public class CreateMessage {
+    private String message;
+    private final ArrayList<Node> nodes;
+    private final Node client;
+    private final Serialize serialize;
+    private final CryptMessage cryptage;
+    private ArrayList<Node> next;
+    
+    private ArrayList<Node> chooseNodes(){
+        Random rand = new Random();
+        ArrayList<Node> result = new ArrayList<>(3);
+        result.add(client);
+        
+        int[] values = new int[3];
+        for (int i=0; i<3;i++) values[i] = (rand.nextInt(nodes.size()));
+        while (values[0] == values[1]) values[1] = rand.nextInt(nodes.size());
+        while (values[2] == values[0] || values[1] == values[2])
+            values[2] = rand.nextInt(nodes.size());
+        for (int i=0;i<3;i++) result.add(nodes.get(values[i]));
+        
+        return result;
+    }
+    private byte[] serialize(byte[] mBytes, Message m) {
+        try {
+            serialize.setMessage(m);
+            mBytes = serialize.serialize();
+        } catch (IOException ex) {
+            Logger.getLogger(CreateMessage.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return mBytes;
+    }
+    private byte[] encrypt(byte[] message, Node client, Node next) {
+        byte[] mBytes = null;
+        Message m = new Message(message, client);
+        mBytes = serialize(mBytes,m);
+        cryptage.setValues(mBytes, next);
+        mBytes = cryptage.crypt();
+        return mBytes;
+    }
+    private SecretKey generateKey(int size) {
+        try {
+            KeyGenerator keyGen = KeyGenerator.getInstance("AES");
+            keyGen.init(size);
+            SecretKey secretKey = keyGen.generateKey();
+            return secretKey;
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(CreateMessage.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+    
+    public Message creation(int value){
+        if (value == 5) {
+            next = chooseNodes();
+            for (int i=1; i<4; i++) 
+                next.get(i).setSecret(generateKey(256));
+            // TO DO : send keys to nodes
+        }
+        byte[] mbytes = message.getBytes();
+        for (int i=0; i < 4; i++) {
+            Node n1 = next.get(i-1);
+            Node n2 = next.get(i);
+            n1.setSecret(null); n2.setSecret(null);
+            mbytes = encrypt(mbytes,n1,n2);
+        } 
+        return new Message(mbytes, next.get(3));
+    }
+    
+    public void setMessage(String m) {
+        message = m;
+    }
+    
+    public CreateMessage(Node c,ArrayList<Node> n) {
+        nodes = n;
+        client = c;
+        serialize = new Serialize();
+        cryptage = new CryptMessage();
+    }  
+}

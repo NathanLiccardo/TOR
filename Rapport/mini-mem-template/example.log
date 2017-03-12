@@ -1,0 +1,219 @@
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=latex 2017.2.23)  1 MAR 2017 18:52
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**example.tex
+(./example.tex
+LaTeX2e <2016/03/31>
+Babel <3.9r> and hyphenation patterns for 83 language(s) loaded.
+(/usr/local/texlive/2016/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2014/09/29 v1.4h Standard LaTeX document class
+(/usr/local/texlive/2016/texmf-dist/tex/latex/base/size10.clo
+File: size10.clo 2014/09/29 v1.4h Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@section=\count80
+\c@subsection=\count81
+\c@subsubsection=\count82
+\c@paragraph=\count83
+\c@subparagraph=\count84
+\c@figure=\count85
+\c@table=\count86
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+)
+(/usr/local/texlive/2016/texmf-dist/tex/latex/natbib/natbib.sty
+Package: natbib 2010/09/13 8.31b (PWD, AO)
+\bibhang=\skip43
+\bibsep=\skip44
+LaTeX Info: Redefining \cite on input line 694.
+\c@NAT@ctr=\count87
+) (./alifexi.sty
+Conference Style for ALIFE XI
+(/usr/local/texlive/2016/texmf-dist/tex/latex/psnfss/times.sty
+Package: times 2005/04/12 PSNFSS-v9.2a (SPQR) 
+)
+(/usr/local/texlive/2016/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2014/10/28 v1.0g Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/usr/local/texlive/2016/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks14
+)
+(/usr/local/texlive/2016/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2016/05/09 v1.0r Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/local/texlive/2016/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 2016/01/03 v1.10 sin cos tan (DPC)
+)
+(/usr/local/texlive/2016/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
+File: graphics.cfg 2016/01/02 v1.10 sample graphics configuration
+)
+Package graphics Info: Driver file: dvips.def on input line 96.
+
+(/usr/local/texlive/2016/texmf-dist/tex/latex/graphics/dvips.def
+File: dvips.def 2015/12/30 v3.0k Driver-dependent file (DPC,SPQR)
+))
+\Gin@req@height=\dimen103
+\Gin@req@width=\dimen104
+)
+LaTeX Font Info:    Redeclaring symbol font `largesymbols' on input line 86.
+LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `normal'
+(Font)                  OMX/cmex/m/n --> OMX/cmex/m/n on input line 86.
+LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `bold'
+(Font)                  OMX/cmex/m/n --> OMX/cmex/m/n on input line 86.
+\titlebox=\skip45
+)
+(./example.aux)
+\openout1 = `example.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 12.
+LaTeX Font Info:    ... okay on input line 12.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 12.
+LaTeX Font Info:    ... okay on input line 12.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 12.
+LaTeX Font Info:    ... okay on input line 12.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 12.
+LaTeX Font Info:    ... okay on input line 12.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 12.
+LaTeX Font Info:    ... okay on input line 12.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 12.
+LaTeX Font Info:    ... okay on input line 12.
+LaTeX Font Info:    Try loading font information for OT1+ptm on input line 12.
+ (/usr/local/texlive/2016/texmf-dist/tex/latex/psnfss/ot1ptm.fd
+File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
+)
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <14.4> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 13.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 13.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 13.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <12> on input line 13.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 13.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 13.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 15.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <12> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 30.
+
+Package natbib Warning: Citation `BTW87' on page 1 undefined on input line 35.
+
+
+Package natbib Warning: Citation `BTW88' on page 1 undefined on input line 35.
+
+
+Package natbib Warning: Citation `SJD' on page 1 undefined on input line 40.
+
+
+Package natbib Warning: Citation `GS' on page 1 undefined on input line 42.
+
+
+Package natbib Warning: Citation `CA2' on page 1 undefined on input line 45.
+
+
+Package natbib Warning: Citation `AB1' on page 1 undefined on input line 49.
+
+
+Package natbib Warning: Citation `OBA' on page 1 undefined on input line 49.
+
+
+Package natbib Warning: Citation `CA2' on page 1 undefined on input line 51.
+
+
+Package natbib Warning: Citation `BUR90' on page 1 undefined on input line 59.
+
+
+Package natbib Warning: Citation `BUR93' on page 1 undefined on input line 59.
+
+
+Package natbib Warning: Citation `WIL' on page 1 undefined on input line 67.
+
+
+Package natbib Warning: Citation `GE77' on page 1 undefined on input line 68.
+
+
+Package natbib Warning: Citation `GE93' on page 1 undefined on input line 68.
+
+
+Package natbib Warning: Citation `ECL96' on page 1 undefined on input line 75.
+
+
+Package natbib Warning: Citation `BS' on page 1 undefined on input line 81.
+
+
+Package natbib Warning: Citation `SB96' on page 1 undefined on input line 84.
+
+
+Package natbib Warning: Citation `BP96' on page 1 undefined on input line 84.
+
+
+Package natbib Warning: Citation `NFST' on page 1 undefined on input line 88.
+
+
+Package natbib Warning: Citation `IAL' on page 1 undefined on input line 95.
+
+[1
+
+
+
+]
+File: fig1.eps Graphic file (type eps)
+ <fig1.eps>
+
+Package natbib Warning: Citation `CHU' on page 2 undefined on input line 184.
+
+[2]
+LaTeX Font Info:    Try loading font information for OT1+pcr on input line 215.
+
+ (/usr/local/texlive/2016/texmf-dist/tex/latex/psnfss/ot1pcr.fd
+File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
+)
+
+Package natbib Warning: Citation `OBA' on page 3 undefined on input line 218.
+
+
+Package natbib Warning: Citation `CHU' on page 3 undefined on input line 257.
+
+File: fig2.eps Graphic file (type eps)
+<fig2.eps>
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <9> on input line 292.
+
+
+Package natbib Warning: Citation `LT94' on page 3 undefined on input line 296.
+
+[3]
+File: fig3.eps Graphic file (type eps)
+ <fig3.eps>
+File: fig4.eps Graphic file (type eps)
+ <fig4.eps>
+
+Package natbib Warning: Citation `ABH' on page 4 undefined on input line 377.
+
+File: fig5.eps Graphic file (type eps)
+<fig5.eps>
+Underfull \vbox (badness 2035) has occurred while \output is active []
+
+ [4]
+No file example.bbl.
+
+Package natbib Warning: There were undefined citations.
+
+[5
+
+] (./example.aux) ) 
+Here is how much of TeX's memory you used:
+ 1036 strings out of 493015
+ 12450 string characters out of 6133377
+ 81357 words of memory out of 5000000
+ 4607 multiletter control sequences out of 15000+600000
+ 12651 words of font info for 37 fonts, out of 8000000 for 9000
+ 1142 hyphenation exceptions out of 8191
+ 32i,11n,21p,234b,290s stack positions out of 5000i,500n,10000p,200000b,80000s
+
+Output written on example.dvi (5 pages, 30068 bytes).
