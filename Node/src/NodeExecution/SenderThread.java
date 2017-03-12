@@ -6,7 +6,7 @@
 package NodeExecution;
 
 import Cryptography.DecryptMessage;
-import MessageTransfert.Message;
+import Message.Message;
 import MessageTransfert.SendMessage;
 import Node.Node;
 import java.io.ByteArrayInputStream;

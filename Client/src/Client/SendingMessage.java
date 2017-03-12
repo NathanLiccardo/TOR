@@ -5,8 +5,8 @@
  */
 package Client;
 
-import MessageTransfert.CreateMessage;
-import MessageTransfert.Message;
+import Message.CreateMessage;
+import Message.Message;
 import MessageTransfert.SendMessage;
 import Node.Node;
 import java.io.IOException;
@@ -22,7 +22,6 @@ public class SendingMessage{
     
     private final Node client;
     private final ArrayList<Node> nodes;
-    private int counter;
     
     private Message message;
     private CreateMessage create;

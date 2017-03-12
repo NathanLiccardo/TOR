@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package MessageTransfert;
+package Message;
 
 import Node.Node;
 import java.io.Serializable;

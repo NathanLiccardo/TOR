@@ -5,7 +5,7 @@
  */
 package NodeExecution;
 
-import MessageTransfert.Message;
+import Message.Message;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.security.Key;

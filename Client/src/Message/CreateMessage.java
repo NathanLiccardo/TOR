@@ -3,9 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package MessageTransfert;
+package Message;
 
 import Cryptography.CryptMessage;
+import MessageTransfert.Serialize;
 import Node.Node;
 import java.io.IOException;
 import java.util.ArrayList;
