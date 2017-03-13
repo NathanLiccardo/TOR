@@ -126,7 +126,6 @@ public class MainFrame extends JFrame implements ActionListener{
     
     public MainFrame(SendingMessage sm){
         send = sm;
-        
         initFrame();
         initLayout();               
         this.setVisible(true);

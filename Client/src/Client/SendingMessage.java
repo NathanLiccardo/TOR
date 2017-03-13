@@ -5,6 +5,7 @@
  */
 package Client;
 
+import Message.Circuit;
 import Message.CreateMessage;
 import Message.Message;
 import MessageTransfert.SendMessage;
@@ -21,24 +22,25 @@ import java.util.logging.Logger;
 public class SendingMessage{
     
     private final Node client;
-    private final ArrayList<Node> nodes;
     
     private Message message;
     private CreateMessage create;
+    private Circuit circuit;
     
     public void createMessage(String msg) {
         create.setMessage(msg);
-        message = create.creation();
+        create.creation();
+        message = create.getMessage();
     }
     public void startThreads() {
-        Thread t = new Thread(new Send(message));
-        t.start();
+        new Thread(new Send(message)).start();
     }
     
     public SendingMessage(Node c,ArrayList<Node> n) {
         client = c;
-        nodes = n;
-        create = new CreateMessage(client,nodes);
+        create = new CreateMessage(client);
+        circuit = new Circuit(n);
+        circuit.createCircuit();
     }
 }
 
@@ -65,13 +67,6 @@ class Send implements Runnable {
         }
         sm.sendMessage(message);
     }
-    private void closeSocket() {
-        try {
-            socket.close();
-        } catch (IOException ex) {
-            Logger.getLogger(Send.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
     
     public Send(Message m){ 
         message = m;
@@ -82,6 +77,10 @@ class Send implements Runnable {
     public void run() {
         initSocket();
         sendMessage();
-        closeSocket();
+        try {
+            socket.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Send.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }
