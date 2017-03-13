@@ -71,7 +71,4 @@ public class Client {
         t1.start();
     }
     
-    
-    
-    
 }
