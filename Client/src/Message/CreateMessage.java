@@ -49,10 +49,9 @@ public class CreateMessage {
         return mBytes;
     }
     private byte[] encrypt(byte[] message, Node client, Node next) {
-        byte[] mBytes = null;
-        Message m = new Message(message, client);
-        mBytes = serialize(mBytes,m);
-        cryptage.setValues(mBytes, next);
+        byte[] mBytes;
+        Message m = new Message(message, null,client);
+        cryptage.setValues(m, next);
         mBytes = cryptage.crypt();
         return mBytes;
     }
@@ -65,7 +64,7 @@ public class CreateMessage {
             Node n2 = next.get(i);
             mbytes = encrypt(mbytes,n1,n2);
         } 
-        return new Message(mbytes, next.get(3));
+        return new Message(mbytes, null, next.get(3));
     }
     
     public void setMessage(String m) {
