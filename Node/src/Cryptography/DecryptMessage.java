@@ -5,16 +5,14 @@
  */
 package Cryptography;
 
-import Node.Node;
+import Message.Message;
+import Message.SerializationUtils;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 /**
@@ -26,53 +24,34 @@ public class DecryptMessage {
     private byte[] message;
     private Key key;
     
-    private int SIZECONSTANT = 256;
+    private final int SIZE;
     
     private Cipher initCipher() {
         Cipher cipher = null;
         try {
             cipher = Cipher.getInstance("RSA"); // create conversion processing object
             cipher.init(Cipher.DECRYPT_MODE, key); // initialize object's mode and key
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(DecryptMessage.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NoSuchPaddingException ex) {
-            Logger.getLogger(DecryptMessage.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InvalidKeyException ex) {
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException ex) {
             Logger.getLogger(DecryptMessage.class.getName()).log(Level.SEVERE, null, ex);
         }
         return cipher;
-    } 
-    private byte[] decryption(byte[] tmp, Cipher cipher) {
-        byte[] decryptedByteData = null;
-        try {
-            decryptedByteData = cipher.doFinal(tmp); // use object for decryption
-        } catch (IllegalBlockSizeException ex) {
-            Logger.getLogger(DecryptMessage.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (BadPaddingException ex) {
-            Logger.getLogger(DecryptMessage.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return decryptedByteData;
-    }
-    private byte[] concatenateByteArrays(byte[] a, byte[] b) {
-        byte[] result = new byte[a.length + b.length]; 
-        System.arraycopy(a, 0, result, 0, a.length); 
-        System.arraycopy(b, 0, result, a.length, b.length); 
-        return result;
     }
     
-    public byte[] decrypt(){
-        byte[] tmp;
-        byte[] result = new byte[0];
+    public Message decrypt(){
+        ByteArray tmp = new ByteArray();
+        ByteArray result = new ByteArray();
         Cipher cipher = initCipher();
         
-        int n = message.length/SIZECONSTANT;
-        if (message.length % SIZECONSTANT != 0) n += 1;
+        int n = ((message.length%SIZE)==0) ? message.length/SIZE : (message.length/SIZE)+1;
+        
         for (int i = 0; i < n; i++){
-            if (i != n-1) tmp = Arrays.copyOfRange(message, i*SIZECONSTANT, (i+1)*SIZECONSTANT);
-            else tmp = Arrays.copyOfRange(message, i*SIZECONSTANT, message.length);
-            result = concatenateByteArrays(result, decryption(tmp,cipher));
+            int start = i*SIZE;
+            int end = (i != n-1) ? (i+1)*SIZE : message.length;
+            tmp.copyOfRange(message, start, end);
+            tmp.decryption(cipher);
+            result.concatenateByteArrays(tmp.getArray());
         }
-        return result;
+        return (Message) SerializationUtils.deserialize(result.getArray());
     }
     
     public void setValues(byte[] m, Key n){
@@ -81,10 +60,13 @@ public class DecryptMessage {
     }
     
     public DecryptMessage(byte[] m, Key k) {
+        SIZE = 256;
         message = m;
         key = k;
     }
     
-    public DecryptMessage(){}
+    public DecryptMessage(){
+        SIZE = 256;
+    }
     
 }

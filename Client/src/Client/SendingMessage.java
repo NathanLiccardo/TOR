@@ -28,6 +28,8 @@ public class SendingMessage{
     private Circuit circuit;
     
     public void createMessage(String msg) {
+        // Ajout vérification avec le conteur + envoi symétrique.
+        circuit.check();
         create.setMessage(msg);
         create.creation();
         message = create.getMessage();

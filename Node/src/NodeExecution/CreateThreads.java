@@ -31,7 +31,7 @@ public class CreateThreads {
         idNode = port;
         localAddress = address;
         queue = new ArrayBlockingQueue<Message>(MAXCONNECTION);
-        receive = new ReceptionThread(idNode,localAddress,queue);
+        receive = new ReceptionThread(idNode,localAddress,queue,k);
         send = new SenderThread(queue,k);
         reception = new Thread(receive);
         sender = new Thread(send);

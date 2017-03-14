@@ -28,7 +28,7 @@ public class Circuit {
     private final CryptMessage crypt;
     
     private static final int SIZE = 3;
-    private static final int COUNTER = 5;
+    private static int COUNTER = 5;
     
     public Circuit(ArrayList<Node> n) {
         nodes = n;
@@ -51,6 +51,13 @@ public class Circuit {
     
     public ArrayList<SecretKey> getSecrets() {
         return keys;
+    }
+    
+    public void check() {
+        COUNTER--;
+        if (COUNTER == 0) {
+            createCircuit();
+        }
     }
     
     private void chooseNodes(){
@@ -83,7 +90,7 @@ public class Circuit {
     private void createMessageSecretKeys() {
         byte[] byteMessage = null;
         Node node = null;
-        for (int i=0; i<SIZE-1; i++){
+        for (int i=0; i<SIZE; i++){
             message.setMessage(byteMessage);
             message.setKey(SerializationUtils.serialize(keys.get(i)));
             message.setNode(node);
@@ -91,10 +98,14 @@ public class Circuit {
             crypt.setValues(message, node);
             byteMessage = crypt.crypt();
         }
+        message.setMessage(byteMessage);
+        message.setKey(null);
+        message.setNode(nodes.get(SIZE-1));
     }
     
     private void sendKeys() {
-        // SendKeys
+        // Send message using SendMessage.sendMessage(message)
+        
     }
     
 }

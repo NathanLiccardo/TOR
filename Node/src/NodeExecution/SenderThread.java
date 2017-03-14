@@ -38,7 +38,7 @@ public class SenderThread implements Runnable{
     public void run() {
         while (isRunning){
             try {
-                Thread t1 = new Thread(new Sender((Message) queue.take(), key));
+                Thread t1 = new Thread(new Sender((Message) queue.take()));
                 t1.start();
             } catch (InterruptedException ex) {
                 System.out.println("Err : reception message");
@@ -53,44 +53,47 @@ public class SenderThread implements Runnable{
 }
 
 class Sender implements Runnable{
-    
-    private Node next;
+    private final Node next;
     private Message nextM;
     private Socket socket;
-    private Key key;
+    SendMessage sm;
     
-    
-    public Sender(Message message, Key k) {
-        key = k;
-        try {
-            byte[] msg = (new DecryptMessage(message.getMessage(),key)).decrypt();
-            nextM = (Message) deserialize(msg);
-        } catch (IOException ex) {
-            Logger.getLogger(Sender.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Sender.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        next = nextM.getNode();
-    }
-    
-    public Message deserialize(byte[] data) throws IOException, ClassNotFoundException {
-        ByteArrayInputStream in = new ByteArrayInputStream(data);
-        ObjectInputStream is = new ObjectInputStream(in);
-        return (Message) is.readObject();
-    }
-    
-    @Override
-    public void run() {
-        SendMessage sm;
+    private void initSocket() {
         try {
             socket = new Socket(next.getIp(),next.getPort());
+        } catch (IOException ex) {
+            Logger.getLogger(Sender.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void sendMessage() {
+        try {
             sm = new SendMessage(socket);
             sm.sendMessage(nextM);
-            System.out.println("Envoyé : ");
-            System.out.println(nextM);
+        } catch (IOException ex) {
+            Logger.getLogger(Sender.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void closeSocket() {
+        try {
             socket.close();
         } catch (IOException ex) {
             Logger.getLogger(Sender.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    @Override
+    public void run() {
+        initSocket();
+        sendMessage();
+        closeSocket();
+        System.out.println("Envoyé : ");
+        System.out.println(nextM);
+    }
+    
+    public Sender(Message message) {
+        next = nextM.getNode();
+        nextM = message;
     }
 }
