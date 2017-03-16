@@ -6,7 +6,10 @@
 package Message;
 
 import Cryptography.CryptMessage;
+import MessageTransfert.SendMessage;
 import Node.Node;
+import java.io.IOException;
+import java.net.Socket;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Random;
@@ -22,18 +25,18 @@ import javax.crypto.SecretKey;
 public class Circuit {
     
     private final ArrayList<Node> nodes;
-    private final ArrayList<Node> circuit;
-    private final ArrayList<SecretKey> keys;
+    private ArrayList<Node> circuit;
+    private ArrayList<SecretKey> keys;
     private Message message;
     private final CryptMessage crypt;
+    private SendMessage sendMessage;
+    private Socket socket;
     
     private static final int SIZE = 3;
     private static int COUNTER = 5;
     
     public Circuit(ArrayList<Node> n) {
         nodes = n;
-        circuit = new ArrayList<>();
-        keys = new ArrayList<>();
         message = new Message(null,null,null);
         crypt = new CryptMessage();
     }
@@ -62,6 +65,7 @@ public class Circuit {
     
     private void chooseNodes(){
         Random rand = new Random();
+        circuit = new ArrayList<>();
         int[] values = new int[SIZE];
         
         for (int i=0;i<SIZE;i++) 
@@ -74,7 +78,8 @@ public class Circuit {
         for (int i=0;i<SIZE;i++) circuit.add(nodes.get(values[i]));
     }
     
-    private void createKey() { 
+    private void createKey() {
+        keys = new ArrayList<>();
         try {
             KeyGenerator keyGen = KeyGenerator.getInstance("AES");
             keyGen.init(256);
@@ -103,9 +108,26 @@ public class Circuit {
         message.setNode(nodes.get(SIZE-1));
     }
     
+    private void initSocket(Node node) {
+        try {
+            socket = new Socket(node.getIp(),node.getPort());
+            sendMessage = new SendMessage(socket);
+        } catch (IOException ex) {
+            Logger.getLogger(Circuit.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void closeSocket() {
+        try {
+            socket.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Circuit.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     private void sendKeys() {
-        // Send message using SendMessage.sendMessage(message)
-        
+        initSocket(message.getNode());
+        sendMessage.sendMessage(message);
     }
     
 }

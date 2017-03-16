@@ -30,9 +30,9 @@ public class CreateThreads {
     public CreateThreads(int port, InetAddress address, Key k) throws IOException{
         idNode = port;
         localAddress = address;
-        queue = new ArrayBlockingQueue<Message>(MAXCONNECTION);
+        queue = new ArrayBlockingQueue<>(MAXCONNECTION);
         receive = new ReceptionThread(idNode,localAddress,queue,k);
-        send = new SenderThread(queue,k);
+        send = new SenderThread(queue);
         reception = new Thread(receive);
         sender = new Thread(send);
     }

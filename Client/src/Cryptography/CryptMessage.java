@@ -50,15 +50,19 @@ public class CryptMessage {
     public byte[] crypt() {
         ByteArray tmp = new ByteArray();
         ByteArray result = new ByteArray();
-        Cipher cipher = initCipherAsymetric();
+        Cipher cipher = this.initCipherAsymetric();
         
-        int n = message.length/SIZE;
-        if (message.length % SIZE != 0) n += 1;
+        int n = (message.length/SIZE) + ((message.length%SIZE!=0) ? 1 : 0);
         
         for (int i = 0; i < n; i++){
             int start = i*SIZE;
-            int end = (i != 0) ? (i+1)*SIZE : message.length;
+            int end = (i+1)*SIZE;
             tmp.copyOfRange(message,start,end);
+            tmp.encryption(cipher);
+            result.concatenateByteArrays(tmp.getArray());
+        }
+        if (message.length%SIZE!=0){
+            tmp.copyOfRange(message, (n-1)*SIZE, message.length);
             tmp.encryption(cipher);
             result.concatenateByteArrays(tmp.getArray());
         }

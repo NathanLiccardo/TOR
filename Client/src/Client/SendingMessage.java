@@ -24,16 +24,16 @@ public class SendingMessage{
     private final Node client;
     
     private Message message;
-    private CreateMessage create;
-    private Circuit circuit;
+    private final CreateMessage create;
+    private final Circuit circuit;
     
     public void createMessage(String msg) {
-        // Ajout vérification avec le conteur + envoi symétrique.
         circuit.check();
         create.setMessage(msg);
         create.creation();
         message = create.getMessage();
     }
+    
     public void startThreads() {
         new Thread(new Send(message)).start();
     }
@@ -48,8 +48,8 @@ public class SendingMessage{
 
 class Send implements Runnable {
     
-    private Node node;
-    private Message message;
+    private final Node node;
+    private final Message message;
     private Socket socket;
     private SendMessage sm;
     
@@ -61,13 +61,19 @@ class Send implements Runnable {
         }
     }
     private void sendMessage() {
-        sm = null;
         try {
             sm = new SendMessage(socket);
         } catch (IOException ex) {
             Logger.getLogger(Send.class.getName()).log(Level.SEVERE, null, ex);
         }
         sm.sendMessage(message);
+    }
+    private void closeSocket() {
+        try {
+            socket.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Send.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     public Send(Message m){ 
@@ -79,10 +85,6 @@ class Send implements Runnable {
     public void run() {
         initSocket();
         sendMessage();
-        try {
-            socket.close();
-        } catch (IOException ex) {
-            Logger.getLogger(Send.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        closeSocket();
     }
 }

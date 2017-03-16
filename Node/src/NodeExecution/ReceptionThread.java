@@ -13,7 +13,6 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import MessageTransfert.ReceiveMessage;
-import MessageTransfert.SendMessage;
 import java.security.Key;
 import java.util.concurrent.BlockingQueue;
 import java.util.logging.Level;
@@ -51,7 +50,6 @@ public class ReceptionThread implements Runnable{
         }
     }
     
-
     @Override
     public void run() {
         while (isRunning) {
@@ -67,10 +65,10 @@ public class ReceptionThread implements Runnable{
     public ReceptionThread(int Lport, InetAddress Laddress, BlockingQueue<Message> queue, Key k) throws IOException{
         isRunning = true;
         port = Lport;
+        key = k;
         address = Laddress;
         blockingQueue = queue;
         server = new ServerSocket(port, 100,address);
-        key = k;
     }
 }
 
@@ -83,6 +81,7 @@ class Reception implements Runnable {
     DecryptMessage decryption;
     SecretKey secretKey;
     Key key;
+    Socket socket;
     
     private int COUNTER = 5;
     
@@ -102,28 +101,39 @@ class Reception implements Runnable {
         message.setKey(null);
     }
     
+    private void getMessage() {
+        message = rm.receiveMessage();
+        COUNTER--;
+    }
+    
     private void sendNext(){
-        if (message.getMessage() != null) {
-            addQueue();
+        if (message.getNode() != null) addQueue();
+        System.out.println("OK");
+    }
+    
+    private void closeSocket(){
+        try {
+            socket.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Reception.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     @Override
     public void run() {
-        message = rm.receiveMessage();
         while (COUNTER > 0) {
-            message = rm.receiveMessage();
+            getMessage();
             addQueue();
-            COUNTER --;
         }
-        System.out.println("Fin de la réception");
+        closeSocket();
     }
     
     public Reception(Socket s, BlockingQueue<Message> bQueue,Key k) throws IOException, InterruptedException{
-        rm = new ReceiveMessage(s);
-        queue = bQueue;
         key = k;
+        queue = bQueue;
+        rm = new ReceiveMessage(s);
         decryption = new DecryptMessage();
+        socket = s;
         getKey();
         sendNext();
     }
