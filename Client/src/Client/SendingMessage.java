@@ -32,9 +32,6 @@ public class SendingMessage{
         create.setMessage(msg);
         create.creation();
         message = create.getMessage();
-    }
-    
-    public void startThreads() {
         new Thread(new Send(message)).start();
     }
     
@@ -48,14 +45,21 @@ public class SendingMessage{
 
 class Send implements Runnable {
     
-    private final Node node;
-    private final Message message;
     private Socket socket;
     private SendMessage sm;
+    private final Node node;
+    private final Message message;
     
     private void initSocket() {
         try {
             socket = new Socket(node.getIp(),node.getPort());
+        } catch (IOException ex) {
+            Logger.getLogger(Send.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    private void closeSocket() {
+        try {
+            socket.close();
         } catch (IOException ex) {
             Logger.getLogger(Send.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -67,13 +71,6 @@ class Send implements Runnable {
             Logger.getLogger(Send.class.getName()).log(Level.SEVERE, null, ex);
         }
         sm.sendMessage(message);
-    }
-    private void closeSocket() {
-        try {
-            socket.close();
-        } catch (IOException ex) {
-            Logger.getLogger(Send.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
     
     public Send(Message m){ 

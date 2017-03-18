@@ -101,7 +101,7 @@ public class Circuit {
             message.setNode(node);
             node = nodes.get(i);
             crypt.setValues(message, node);
-            byteMessage = crypt.crypt();
+            byteMessage = crypt.crypt(false);
         }
         message.setMessage(byteMessage);
         message.setKey(null);

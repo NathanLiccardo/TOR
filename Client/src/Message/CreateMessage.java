@@ -18,12 +18,12 @@ public class CreateMessage {
     private final CryptMessage cryptage;
     private Message message;
     
-    private static int SIZE = 3;
+    private final int SIZE = 3;
     
     public void creation(){
         for (int i=0; i < SIZE; i++) {
             cryptage.setValues(message, nodes.get(i));
-            message.setMessage(cryptage.crypt());
+            message.setMessage(cryptage.crypt(true));
             message.setNode(nodes.get(i));
         }
     }

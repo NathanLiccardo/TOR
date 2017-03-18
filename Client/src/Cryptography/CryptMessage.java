@@ -26,7 +26,7 @@ public class CryptMessage {
     private Node node;
     private Key key;
     
-    private int SIZE = 245;
+    private final int SIZE = 245;
     
     public CryptMessage(byte[] m,Node n) {
         message = m;
@@ -47,10 +47,22 @@ public class CryptMessage {
         return cipher;
     }
     
-    public byte[] crypt() {
+    // Create symetric crypt
+    private Cipher initCipherSymetric() {
+        Cipher cipher = null;
+        try {
+            cipher = Cipher.getInstance("AES");
+            cipher.init(Cipher.ENCRYPT_MODE, key);
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException ex) {
+            Logger.getLogger(CryptMessage.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return cipher;
+    }
+    
+    public byte[] crypt(boolean symetric) {
         ByteArray tmp = new ByteArray();
         ByteArray result = new ByteArray();
-        Cipher cipher = this.initCipherAsymetric();
+        Cipher cipher = symetric ? this.initCipherSymetric() : this.initCipherAsymetric();
         
         int n = (message.length/SIZE) + ((message.length%SIZE!=0) ? 1 : 0);
         
