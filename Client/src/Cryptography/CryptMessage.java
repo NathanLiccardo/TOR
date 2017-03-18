@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 
 /**
  *
@@ -25,8 +26,10 @@ public class CryptMessage {
     private byte[] message;
     private Node node;
     private Key key;
+    private SecretKey secretKey;
     
-    private final int SIZE = 245;
+    private final int SIZE1 = 245;
+    private final int SIZE2 = 128;
     
     public CryptMessage(byte[] m,Node n) {
         message = m;
@@ -47,22 +50,28 @@ public class CryptMessage {
         return cipher;
     }
     
-    // Create symetric crypt
     private Cipher initCipherSymetric() {
-        Cipher cipher = null;
         try {
+            Cipher cipher = null;
             cipher = Cipher.getInstance("AES");
-            cipher.init(Cipher.ENCRYPT_MODE, key);
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException ex) {
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+            return cipher;
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(CryptMessage.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchPaddingException ex) {
+            Logger.getLogger(CryptMessage.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidKeyException ex) {
             Logger.getLogger(CryptMessage.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return cipher;
+        return null;
     }
     
     public byte[] crypt(boolean symetric) {
+        int SIZE = symetric ? SIZE2 : SIZE1;
+        Cipher cipher = symetric ? this.initCipherSymetric() : this.initCipherAsymetric();
+        
         ByteArray tmp = new ByteArray();
         ByteArray result = new ByteArray();
-        Cipher cipher = symetric ? this.initCipherSymetric() : this.initCipherAsymetric();
         
         int n = (message.length/SIZE) + ((message.length%SIZE!=0) ? 1 : 0);
         
@@ -81,10 +90,15 @@ public class CryptMessage {
         return result.getArray();
     }
     
-    public void setValues(Message m, Node n){
+    public void setValues(Message m, Node n) {
         message = SerializationUtils.serialize(m);
         node = n;
         key = node.getKey();
+    }
+    
+    public void setValues(Message m, SecretKey k) {
+        message = SerializationUtils.serialize(m);
+        secretKey = k;
     }
    
 }

@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 
 /**
  *
@@ -23,26 +24,40 @@ public class DecryptMessage {
     
     private byte[] message;
     private Key key;
+    private SecretKey secretKey;
     
-    private final int SIZE;
+    private final int SIZE1 = 256;
+    private final int SIZE2 = 128;
     
-    private Cipher initCipher() {
+    private Cipher initCipherAsymetric() {
         Cipher cipher = null;
         try {
-            cipher = Cipher.getInstance("RSA"); // create conversion processing object
-            cipher.init(Cipher.DECRYPT_MODE, key); // initialize object's mode and key
+            cipher = Cipher.getInstance("RSA");
+            cipher.init(Cipher.DECRYPT_MODE, key); 
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException ex) {
+            Logger.getLogger(DecryptMessage.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return cipher;
+    }
+    private Cipher initCipherSymetric() {
+        Cipher cipher = null;
+        try {
+            cipher = Cipher.getInstance("AES"); 
+            cipher.init(Cipher.DECRYPT_MODE, secretKey); 
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException ex) {
             Logger.getLogger(DecryptMessage.class.getName()).log(Level.SEVERE, null, ex);
         }
         return cipher;
     }
     
-    public Message decrypt(){
+    public Message decrypt(boolean symetric){
+        System.out.println("Symetric : "+symetric);
+        int SIZE = (symetric) ? SIZE2 : SIZE1;
+        Cipher cipher = (symetric) ? initCipherSymetric() : initCipherAsymetric();
+        int n = (message.length/SIZE) + (message.length%SIZE == 0 ? 0 : 1);
+        
         ByteArray tmp = new ByteArray();
         ByteArray result = new ByteArray();
-        Cipher cipher = initCipher();
-        
-        int n = ((message.length%SIZE)==0) ? message.length/SIZE : (message.length/SIZE)+1;
         
         for (int i = 0; i < n; i++){
             int start = i*SIZE;
@@ -59,14 +74,16 @@ public class DecryptMessage {
         key = n;
     }
     
+    public void setValues(byte[] m, SecretKey n) {
+        message = m;
+        secretKey = n;
+    }
+    
     public DecryptMessage(byte[] m, Key k) {
-        SIZE = 256;
         message = m;
         key = k;
     }
     
-    public DecryptMessage(){
-        SIZE = 256;
-    }
+    public DecryptMessage(){}
     
 }

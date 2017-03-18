@@ -8,30 +8,33 @@ package Message;
 import Cryptography.CryptMessage;
 import Node.Node;
 import java.util.ArrayList;
+import javax.crypto.SecretKey;
 /**
  *
  * @author Nathan
  */
 public class CreateMessage {
-    private ArrayList<Node> nodes;
-    private final Node client;
-    private final CryptMessage cryptage;
+    private ArrayList<SecretKey> key;
     private Message message;
+    private final Node client;
+    private ArrayList<Node> nodes;
+    private final CryptMessage cryptage;
     
     private final int SIZE = 3;
     
     public void creation(){
         for (int i=0; i < SIZE; i++) {
-            cryptage.setValues(message, nodes.get(i));
+            cryptage.setValues(message, key.get(i));
             message.setMessage(cryptage.crypt(true));
             message.setNode(nodes.get(i));
         }
     }
     
-    public void setMessage(String m) {
-        message.setMessage(m.getBytes());
+    public void setMessage(String m, ArrayList<SecretKey> s) {
+        message.setKey(m.getBytes());
         message.setKey(null);
         message.setNode(client);
+        key = s;
     }
     
     public Message getMessage() {
@@ -45,5 +48,6 @@ public class CreateMessage {
     public CreateMessage(Node c) {
         client = c;
         cryptage = new CryptMessage();
+        message = new Message(null,null,null);
     }  
 }

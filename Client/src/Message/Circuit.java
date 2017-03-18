@@ -33,7 +33,7 @@ public class Circuit {
     private Socket socket;
     
     private static final int SIZE = 3;
-    private static int COUNTER = 5;
+    private int COUNTER = 5;
     
     public Circuit(ArrayList<Node> n) {
         nodes = n;
@@ -56,9 +56,14 @@ public class Circuit {
         return keys;
     }
     
+    public SendMessage getConnection() {
+        return sendMessage;
+    }
+    
     public void check() {
         COUNTER--;
         if (COUNTER == 0) {
+            closeSocket();
             createCircuit();
         }
     }
@@ -69,7 +74,7 @@ public class Circuit {
         int[] values = new int[SIZE];
         
         for (int i=0;i<SIZE;i++) 
-            values[i] = (rand.nextInt(nodes.size()));
+            values[i] = rand.nextInt(nodes.size());
         while (values[0] == values[1]) 
             values[1] = rand.nextInt(nodes.size());
         while (values[2] == values[0] || values[1] == values[2])
@@ -82,7 +87,7 @@ public class Circuit {
         keys = new ArrayList<>();
         try {
             KeyGenerator keyGen = KeyGenerator.getInstance("AES");
-            keyGen.init(256);
+            keyGen.init(128);
             for (int i=0;i<SIZE; i++) {
                 SecretKey secretKey = keyGen.generateKey();
                 keys.add(secretKey);

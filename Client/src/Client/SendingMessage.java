@@ -29,10 +29,11 @@ public class SendingMessage{
     
     public void createMessage(String msg) {
         circuit.check();
-        create.setMessage(msg);
+        create.setMessage(msg,circuit.getSecrets());
+        create.setNodes(circuit.getCircuit());
         create.creation();
         message = create.getMessage();
-        new Thread(new Send(message)).start();
+        new Thread(new Send(message,circuit.getConnection())).start();
     }
     
     public SendingMessage(Node c,ArrayList<Node> n) {
@@ -65,16 +66,12 @@ class Send implements Runnable {
         }
     }
     private void sendMessage() {
-        try {
-            sm = new SendMessage(socket);
-        } catch (IOException ex) {
-            Logger.getLogger(Send.class.getName()).log(Level.SEVERE, null, ex);
-        }
         sm.sendMessage(message);
     }
     
-    public Send(Message m){ 
+    public Send(Message m, SendMessage send){ 
         message = m;
+        sm = send;
         node = m.getNode(); 
     }
 

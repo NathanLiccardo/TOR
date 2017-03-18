@@ -72,8 +72,6 @@ public class ReceptionThread implements Runnable{
     }
 }
 
-// Ajout du décryptage avec la clé AES
-
 class Reception implements Runnable {
     ReceiveMessage rm;
     Message message;
@@ -95,20 +93,23 @@ class Reception implements Runnable {
     
     private void getKey() {
         message = rm.receiveMessage();
-        decryption.setValues(message.getMessage(), key);
-        message = decryption.decrypt();
+        decryption.setValues(message.getMessage(),key);
+        message = decryption.decrypt(false);
         secretKey = (SecretKey) SerializationUtils.deserialize(message.getKey());
         message.setKey(null);
+        System.out.println("Clé secrète reçue : "+secretKey);
     }
     
     private void getMessage() {
         message = rm.receiveMessage();
+        decryption.setValues(message.getMessage(), secretKey);
+        message = decryption.decrypt(true);
         COUNTER--;
     }
     
     private void sendNext(){
         if (message.getNode() != null) addQueue();
-        System.out.println("OK");
+        System.out.println("Send Next");
     }
     
     private void closeSocket(){
