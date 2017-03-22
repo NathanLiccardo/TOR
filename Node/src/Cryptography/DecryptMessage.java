@@ -51,7 +51,6 @@ public class DecryptMessage {
     }
     
     public Message decrypt(boolean symetric){
-        System.out.println("Symetric : "+symetric);
         int SIZE = (symetric) ? SIZE2 : SIZE1;
         Cipher cipher = (symetric) ? initCipherSymetric() : initCipherAsymetric();
         int n = (message.length/SIZE) + (message.length%SIZE == 0 ? 0 : 1);

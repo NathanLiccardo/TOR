@@ -42,9 +42,4 @@ public class CreateThreads {
         sender.start();
     }
     
-    public void stopThread(){
-        receive.endTask();
-        send.endTask();
-    }
-    
 }

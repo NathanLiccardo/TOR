@@ -14,9 +14,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import MessageTransfert.ReceiveMessage;
 import java.security.Key;
+import java.util.Base64;
 import java.util.concurrent.BlockingQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.crypto.SecretKey;
 
 /**
@@ -24,119 +23,99 @@ import javax.crypto.SecretKey;
  * @author nathan
  */
 public class ReceptionThread implements Runnable{
-    private Boolean isRunning;
-    private int port;
-    private InetAddress address;
-    private ServerSocket server;
-    private Socket socket;
-    private Thread reception;
-    private BlockingQueue<Message> blockingQueue;
-    private Key key;
-    
-    private void accept() {
-        try {
-            socket = server.accept();
-        } catch (IOException ex) {
-            Logger.getLogger(ReceptionThread.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    
-    private void startT() {
-        try {
-            reception = new Thread(new Reception(socket,blockingQueue,key));
-            reception.start();
-        } catch (IOException | InterruptedException ex) {
-            Logger.getLogger(ReceptionThread.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
+    private Socket _socket;
+    private final Key _key;
+    private final ServerSocket _server;
+    private final BlockingQueue<Message> _blockingQueue;
     
     @Override
     public void run() {
-        while (isRunning) {
-            accept();
-            startT();
+        while (true) {
+            try {
+                _socket = _server.accept();
+            } catch (IOException ex) {
+                System.err.println(ex);
+            }
+            try {
+                new Thread(new Reception(_socket,_blockingQueue,_key)).start();
+            } catch (IOException | InterruptedException ex) {
+                System.err.println(ex);
+            }
         }
     }
     
-    public void endTask() {
-        isRunning = false;
-    }
-    
     public ReceptionThread(int Lport, InetAddress Laddress, BlockingQueue<Message> queue, Key k) throws IOException{
-        isRunning = true;
-        port = Lport;
-        key = k;
-        address = Laddress;
-        blockingQueue = queue;
-        server = new ServerSocket(port, 100,address);
+        _key = k;
+        _blockingQueue = queue;
+        _server = new ServerSocket(Lport, 100,Laddress);
     }
 }
 
 class Reception implements Runnable {
-    ReceiveMessage rm;
-    Message message;
-    BlockingQueue<Message> queue;
-    DecryptMessage decryption;
-    SecretKey secretKey;
-    Key key;
-    Socket socket;
+    private final Key _key;
+    private Message _message;
+    private SecretKey _secretKey;
+    private final Socket _socket;
+    private final ReceiveMessage _rm;
+    private final DecryptMessage _decryption;
+    private final BlockingQueue<Message> _queue;
     
     private int COUNTER = 5;
     
     private void addQueue() {
-        try {
-            queue.put(message);
+        try { 
+            _queue.put(_message);
         } catch (InterruptedException ex) {
-            Logger.getLogger(Reception.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println(ex);
         }
     }
     
-    private void getKey() {
-        message = rm.receiveMessage();
-        decryption.setValues(message.getMessage(),key);
-        message = decryption.decrypt(false);
-        secretKey = (SecretKey) SerializationUtils.deserialize(message.getKey());
-        message.setKey(null);
-        System.out.println("Clé secrète reçue : "+secretKey);
+    private void getMessage(boolean secret) {
+        _message = _rm.receiveMessage();
+        if (secret) _decryption.setValues(_message.getMessage(), _secretKey);
+        else _decryption.setValues(_message.getMessage(), _key);
+        _message = _decryption.decrypt(secret);
     }
     
-    private void getMessage() {
-        message = rm.receiveMessage();
-        decryption.setValues(message.getMessage(), secretKey);
-        message = decryption.decrypt(true);
+    private void getKey() {
+        this.getMessage(false);
+        _secretKey = (SecretKey) SerializationUtils.deserialize(_message.getKey());
+        _message.setKey(null);
+        this.sendNext();
+    }
+    
+    private void receiveMessage() {
+        this.getMessage(true);
+        this.sendNext();
         COUNTER--;
     }
     
     private void sendNext(){
-        if (message.getNode() != null) addQueue();
-        System.out.println("Send Next");
+        if (_message.getNode() != null) 
+            addQueue();
     }
     
     private void closeSocket(){
         try {
-            socket.close();
+            _socket.close();
         } catch (IOException ex) {
-            Logger.getLogger(Reception.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println(ex);
         }
     }
 
     @Override
     public void run() {
-        while (COUNTER > 0) {
-            getMessage();
-            addQueue();
-        }
+        while (COUNTER > 0) receiveMessage();
         closeSocket();
     }
     
     public Reception(Socket s, BlockingQueue<Message> bQueue,Key k) throws IOException, InterruptedException{
-        key = k;
-        queue = bQueue;
-        rm = new ReceiveMessage(s);
-        decryption = new DecryptMessage();
-        socket = s;
-        getKey();
-        sendNext();
+        _key = k;
+        _socket = s;
+        _queue = bQueue;
+        _rm = new ReceiveMessage(_socket);
+        _decryption = new DecryptMessage();
+        this.getKey();
     }
     
 }

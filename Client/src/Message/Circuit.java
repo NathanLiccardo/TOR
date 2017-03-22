@@ -104,6 +104,7 @@ public class Circuit {
             message.setMessage(byteMessage);
             message.setKey(SerializationUtils.serialize(keys.get(i)));
             message.setNode(node);
+            message.setNum(i);
             node = nodes.get(i);
             crypt.setValues(message, node);
             byteMessage = crypt.crypt(false);

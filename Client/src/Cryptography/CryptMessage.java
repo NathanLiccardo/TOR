@@ -51,8 +51,8 @@ public class CryptMessage {
     }
     
     private Cipher initCipherSymetric() {
+        Cipher cipher = null;
         try {
-            Cipher cipher = null;
             cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
             return cipher;
@@ -63,7 +63,7 @@ public class CryptMessage {
         } catch (InvalidKeyException ex) {
             Logger.getLogger(CryptMessage.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return null;
+        return cipher;
     }
     
     public byte[] crypt(boolean symetric) {

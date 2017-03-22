@@ -43,9 +43,7 @@ public class ReceiveMessage {
     
     public Message receiveMessage(){
         try {
-            Message val;
-            val = (Message) input.readObject();
-            return val;
+            return (Message) input.readObject();
         } catch (IOException | ClassNotFoundException ex) {
             Logger.getLogger(ReceiveMessage.class.getName()).log(Level.SEVERE, null, ex);
         }

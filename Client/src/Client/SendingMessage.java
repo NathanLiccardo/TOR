@@ -10,11 +10,7 @@ import Message.CreateMessage;
 import Message.Message;
 import MessageTransfert.SendMessage;
 import Node.Node;
-import java.io.IOException;
-import java.net.Socket;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 /**
  *
  * @author Nathan
@@ -29,9 +25,8 @@ public class SendingMessage{
     
     public void createMessage(String msg) {
         circuit.check();
-        create.setMessage(msg,circuit.getSecrets());
         create.setNodes(circuit.getCircuit());
-        create.creation();
+        create.creation(msg,circuit.getSecrets());
         message = create.getMessage();
         new Thread(new Send(message,circuit.getConnection())).start();
     }
@@ -46,25 +41,9 @@ public class SendingMessage{
 
 class Send implements Runnable {
     
-    private Socket socket;
     private SendMessage sm;
-    private final Node node;
     private final Message message;
     
-    private void initSocket() {
-        try {
-            socket = new Socket(node.getIp(),node.getPort());
-        } catch (IOException ex) {
-            Logger.getLogger(Send.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    private void closeSocket() {
-        try {
-            socket.close();
-        } catch (IOException ex) {
-            Logger.getLogger(Send.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
     private void sendMessage() {
         sm.sendMessage(message);
     }
@@ -72,13 +51,10 @@ class Send implements Runnable {
     public Send(Message m, SendMessage send){ 
         message = m;
         sm = send;
-        node = m.getNode(); 
     }
 
     @Override
     public void run() {
-        initSocket();
         sendMessage();
-        closeSocket();
     }
 }

@@ -48,4 +48,12 @@ public class Message implements Serializable{
         key = k;
     }
     
+    private int _val = -1;
+    public void setNum(int num) {
+        _val = num;
+    }
+    public int getNum() {
+        return _val;
+    }
+    
 }

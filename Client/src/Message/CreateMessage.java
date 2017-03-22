@@ -16,25 +16,22 @@ import javax.crypto.SecretKey;
 public class CreateMessage {
     private ArrayList<SecretKey> key;
     private Message message;
-    private final Node client;
+    private Node client;
     private ArrayList<Node> nodes;
     private final CryptMessage cryptage;
     
     private final int SIZE = 3;
     
-    public void creation(){
+    public void creation(String m, ArrayList<SecretKey> s){
+        key = s;
+        message.setKey(m.getBytes());
+        message.setKey(null);
+        message.setNode(client);
         for (int i=0; i < SIZE; i++) {
             cryptage.setValues(message, key.get(i));
             message.setMessage(cryptage.crypt(true));
             message.setNode(nodes.get(i));
         }
-    }
-    
-    public void setMessage(String m, ArrayList<SecretKey> s) {
-        message.setKey(m.getBytes());
-        message.setKey(null);
-        message.setNode(client);
-        key = s;
     }
     
     public Message getMessage() {
