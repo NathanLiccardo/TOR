@@ -5,81 +5,134 @@
  */
 package NodeExecution;
 
-import MessageTransfert.Message;
+import Cryptography.DecryptMessage;
+import Message.Message;
+import Message.SerializationUtils;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import MessageTransfert.ReceiveMessage;
 import MessageTransfert.SendMessage;
-import java.util.concurrent.BlockingQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import Node.Node;
+import java.security.Key;
+import javax.crypto.SecretKey;
 
 /**
  *
  * @author nathan
  */
 public class ReceptionThread implements Runnable{
-    private Boolean isRunning;
-    private int port;
-    private InetAddress address;
-    private ServerSocket server;
-    private Socket socket;
-    private Thread reception;
-    private BlockingQueue<Message> blockingQueue;
+    private Socket _socket;
+    private final Key _key;
+    private ServerSocket _server;
     
-    
-    public ReceptionThread(int Lport, InetAddress Laddress, BlockingQueue<Message> queue) throws IOException{
-        isRunning = true;
-        port = Lport;
-        address = Laddress;
-        blockingQueue = queue;
-        System.out.println(address);
-        System.out.println(port);
-        server = new ServerSocket(port, 100,address);
-    }
-
     @Override
     public void run() {
-        while (isRunning) {
+        while (true) {
             try {
-                socket = server.accept();
-                reception = new Thread(new Reception(socket,blockingQueue));
-                reception.start();
+                _socket = _server.accept();
             } catch (IOException ex) {
-                System.out.println("Err : run");
+                System.err.println(ex);
+            }
+            try {
+                new Thread(new Reception(_socket,_key)).start();
+            } catch (IOException | InterruptedException ex) {
+                System.err.println(ex);
             }
         }
     }
     
-    public void endTask() {
-        isRunning = false;
+    public ReceptionThread(int Lport, InetAddress Laddress, Key k){
+        _key = k;
+        try {
+            _server = new ServerSocket(Lport, 100,Laddress);
+        } catch (IOException ex) {
+            System.err.println(ex);
+        }
     }
 }
 
 class Reception implements Runnable {
-    ReceiveMessage rm;
-    SendMessage sm;
-    Message message;
-    BlockingQueue<Message> queue;
+    private final Key _key;
+    private Node _nextNode;
+    private Message _message;
+    private SecretKey _secretKey;
+    private final Socket _socket;
+    private SendMessage _sendMessage;
+    private final DecryptMessage _decryption;
+    private final ReceiveMessage _receiveMessage;
     
-    public Reception(Socket s, BlockingQueue<Message> bQueue) throws IOException{
-        rm = new ReceiveMessage(s);
-        sm = new SendMessage(s);
-        queue = bQueue;
+    private int COUNTER = 5;
+    
+    private void openCommunication() {
+        Socket socket = null;
+        try {
+            socket = new Socket(_nextNode.getIp(),_nextNode.getPort());
+        } catch (IOException ex) {
+            System.err.println(ex);
+        }
+        try {
+            _sendMessage = new SendMessage(socket);
+        } catch (IOException ex) { 
+            System.err.println(ex); 
+        }
+    }
+    
+    private void sendMessage() {
+        _sendMessage.sendMessage(_message);
+    }
+    
+    private void getMessage(boolean secret) {
+        _message = _receiveMessage.receiveMessage();
+        if (secret) _decryption.setValues(_message.getMessage(), _secretKey);
+        else _decryption.setValues(_message.getMessage(), _key);
+        _message = _decryption.decrypt(secret);
+    }
+    
+    private void getKey() {
+        this.getMessage(false);
+        _secretKey = (SecretKey) SerializationUtils.deserialize(_message.getKey());
+        _message.setKey(null);
+        _nextNode = _message.getNode();
+        sendNext();
+    }
+    
+    private void receiveMessage() {
+        this.getMessage(true);
+        this.sendNext();
+        COUNTER--;
+    }
+    
+    private void sendNext(){
+        if (_message.getNode() != null) {
+            _nextNode = _message.getNode();
+            if (_sendMessage == null) openCommunication();
+            sendMessage();
+        }
+    }
+    
+    private void closeSocket(){
+        try {
+            _socket.close();
+        } catch (IOException ex) {
+            System.out.println(ex);
+        }
     }
 
     @Override
     public void run() {
-        message = rm.receiveMessage();
-        System.out.println("Message reçu :");
-        System.out.println(message);
-        try {
-            queue.put(message);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(Reception.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        while (COUNTER > 0) receiveMessage();
+        closeSocket();
+    }
+    
+    public Reception(Socket s, Key k) throws IOException, InterruptedException{
+        _key = k;
+        _socket = s;
+        _sendMessage = null;
+        _receiveMessage = new ReceiveMessage(_socket);
+        _decryption = new DecryptMessage();
+        this.getKey();
     }
     
 }

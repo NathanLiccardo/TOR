@@ -114,7 +114,6 @@ public class MainFrame extends JFrame implements ActionListener{
     @Override
     public void actionPerformed(ActionEvent e) {
         send.createMessage(tf.getText());
-        send.startThreads();
         updateScrollPane("Vous : \n"+tf.getText());
         tf.setText(" ");
     }
@@ -126,7 +125,6 @@ public class MainFrame extends JFrame implements ActionListener{
     
     public MainFrame(SendingMessage sm){
         send = sm;
-        
         initFrame();
         initLayout();               
         this.setVisible(true);

@@ -5,7 +5,7 @@
  */
 package Node;
 
-import NodeExecution.CreateThreads;
+import NodeExecution.ReceptionThread;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.security.Key;
@@ -48,11 +48,10 @@ public class Main {
     public static void main(String[] args) throws IOException {
         addres = InetAddress.getByName("localhost");
         initKey(keyGen());
-        CreateThreads creation;
         
         ConnexionServer connexion = new ConnexionServer(publicK);
-        creation = new CreateThreads(connexion.getNumber(),addres,privateK);
-        creation.startThreads();
+        ReceptionThread reception = new ReceptionThread(connexion.getNumber(),addres,privateK);
+        new Thread(reception).start();
     }
     
 }

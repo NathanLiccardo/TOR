@@ -9,12 +9,9 @@ import Node.Node;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 /**
@@ -27,59 +24,7 @@ public class DecryptMessage {
     private Node node;
     private Key key;
     
-    private Cipher initCipher() {
-        Cipher cipher = null;
-        try {
-            cipher = Cipher.getInstance("RSA"); // create conversion processing object
-            cipher.init(Cipher.DECRYPT_MODE, key); // initialize object's mode and key
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(DecryptMessage.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NoSuchPaddingException ex) {
-            Logger.getLogger(DecryptMessage.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InvalidKeyException ex) {
-            Logger.getLogger(DecryptMessage.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return cipher;
-    }
-    private byte[] decryption(Cipher cipher, byte[] tmp) {
-        byte[] decryptedByteData = null;
-        try {
-            decryptedByteData = cipher.doFinal(tmp);
-        } catch (IllegalBlockSizeException ex) {
-            Logger.getLogger(DecryptMessage.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (BadPaddingException ex) {
-            Logger.getLogger(DecryptMessage.class.getName()).log(Level.SEVERE, null, ex);
-        }        
-        return decryptedByteData;
-    }
-    private byte[] concatenateByteArrays(byte[] a, byte[] b) {
-        byte[] result = new byte[a.length + b.length]; 
-        System.arraycopy(a, 0, result, 0, a.length); 
-        System.arraycopy(b, 0, result, a.length, b.length); 
-        return result;
-    }
-    
-    public byte[] decrypt(){
-        byte[] tmp;
-        byte[] result = new byte[0];
-        Cipher cipher = initCipher();
-        
-        int n = message.length/265;
-        if (message.length % 265 != 0) n += 1;
-        
-        for (int i = 0; i < n; i++){
-            if (i != n-1)tmp = Arrays.copyOfRange(message, i*265, (i+1)*265);
-            else tmp = Arrays.copyOfRange(message, i*265, message.length);
-            result = concatenateByteArrays(result, decryption(cipher,tmp));
-        }
-        return result;
-    }
-    
-    public void setValues(byte[] m, Node n){
-        message = m;
-        node = n;
-        key = node.getKey();
-    }
+    private static int SIZE = 256;
     
     public DecryptMessage(byte[] m,Node n) {
         message = m;
@@ -88,4 +33,40 @@ public class DecryptMessage {
     }
     
     public DecryptMessage(){}
+    
+    private Cipher initCipher() {
+        Cipher cipher = null;
+        try {
+            cipher = Cipher.getInstance("RSA");
+            cipher.init(Cipher.DECRYPT_MODE, key); 
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException ex) {
+            Logger.getLogger(DecryptMessage.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return cipher;
+    }
+    
+    public byte[] decrypt(){
+        ByteArray tmp = new ByteArray();
+        ByteArray result = new ByteArray();
+        Cipher cipher = initCipher();
+        
+        int n = message.length/SIZE;
+        if (message.length % SIZE != 0) n += 1;
+        
+        for (int i = 0; i < n; i++){
+            int start = i*SIZE;
+            int end = (i != n-1) ? (i+1)*SIZE : message.length;
+            tmp.copyOfRange(message, start, end);
+            tmp.decryption(cipher);
+            result.concatenateByteArrays(tmp.getArray());
+        }
+        return result.getArray();
+    }
+    
+    public void setValues(byte[] m, Node n){
+        message = m;
+        node = n;
+        key = node.getKey();
+    }
+    
 }

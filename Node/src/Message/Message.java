@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package MessageTransfert;
+package Message;
 
 import Node.Node;
 import java.io.Serializable;
@@ -15,10 +15,12 @@ import java.io.Serializable;
 public class Message implements Serializable{
     
     private byte[] message;
+    private byte[] key;
     private Node next;
     
-    public Message(byte[] m, Node n) {
+    public Message(byte[] m, byte[] k, Node n) {
         message = m;
+        key = k;
         next = n;
     }
     
@@ -36,6 +38,22 @@ public class Message implements Serializable{
     
     public void setNode(Node n) {
         next = n;
+    }
+    
+    public byte[] getKey(){
+        return key;
+    }
+    
+    public void setKey(byte[] k) {
+        key = k;
+    }
+    
+    private int _val = -1;
+    public void setNum(int num) {
+        _val = num;
+    }
+    public int getNum() {
+        return _val;
     }
     
 }

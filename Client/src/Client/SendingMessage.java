@@ -5,15 +5,12 @@
  */
 package Client;
 
-import MessageTransfert.CreateMessage;
-import MessageTransfert.Message;
+import Message.Circuit;
+import Message.CreateMessage;
+import Message.Message;
 import MessageTransfert.SendMessage;
 import Node.Node;
-import java.io.IOException;
-import java.net.Socket;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 /**
  *
  * @author Nathan
@@ -21,68 +18,43 @@ import java.util.logging.Logger;
 public class SendingMessage{
     
     private final Node client;
-    private final ArrayList<Node> nodes;
-    private int counter;
     
     private Message message;
-    private CreateMessage create;
+    private final CreateMessage create;
+    private final Circuit circuit;
     
     public void createMessage(String msg) {
-        create.setMessage(msg);
-        message = create.creation();
-    }
-    public void startThreads() {
-        Thread t = new Thread(new Send(message));
-        t.start();
+        circuit.check();
+        create.setNodes(circuit.getCircuit());
+        create.creation(msg,circuit.getSecrets());
+        message = create.getMessage();
+        new Thread(new Send(message,circuit.getConnection())).start();
     }
     
     public SendingMessage(Node c,ArrayList<Node> n) {
         client = c;
-        nodes = n;
-        create = new CreateMessage(client,nodes);
+        create = new CreateMessage(client);
+        circuit = new Circuit(n);
+        circuit.createCircuit();
     }
 }
 
 class Send implements Runnable {
     
-    private Node node;
-    private Message message;
-    private Socket socket;
     private SendMessage sm;
+    private final Message message;
     
-    private void initSocket() {
-        try {
-            socket = new Socket(node.getIp(),node.getPort());
-        } catch (IOException ex) {
-            Logger.getLogger(Send.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
     private void sendMessage() {
-        sm = null;
-        try {
-            sm = new SendMessage(socket);
-        } catch (IOException ex) {
-            Logger.getLogger(Send.class.getName()).log(Level.SEVERE, null, ex);
-        }
         sm.sendMessage(message);
     }
-    private void closeSocket() {
-        try {
-            socket.close();
-        } catch (IOException ex) {
-            Logger.getLogger(Send.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
     
-    public Send(Message m){ 
+    public Send(Message m, SendMessage send){ 
         message = m;
-        node = m.getNode(); 
+        sm = send;
     }
 
     @Override
     public void run() {
-        initSocket();
         sendMessage();
-        closeSocket();
     }
 }

@@ -5,17 +5,14 @@
  */
 package Cryptography;
 
-import Node.Node;
+import Message.Message;
+import Message.SerializationUtils;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 
 /**
  *
@@ -23,66 +20,58 @@ import javax.crypto.NoSuchPaddingException;
  */
 public class DecryptMessage {
     
-    private byte[] message;
-    private Key key;
+    private Key _key;
+    private int _size;
+    private Cipher _cipher;
+    private byte[] _message;
+    private SecretKey _secretKey;
     
-    private int SIZECONSTANT = 256;
+    private final int _SIZERSA = 256;
+    private final int _SIZEAES = 144;
     
-    private Cipher initCipher() {
-        Cipher cipher = null;
+    private void initCipher(String mode) {
+        _cipher = null;
         try {
-            cipher = Cipher.getInstance("RSA"); // create conversion processing object
-            cipher.init(Cipher.DECRYPT_MODE, key); // initialize object's mode and key
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(DecryptMessage.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NoSuchPaddingException ex) {
-            Logger.getLogger(DecryptMessage.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InvalidKeyException ex) {
-            Logger.getLogger(DecryptMessage.class.getName()).log(Level.SEVERE, null, ex);
+            _cipher = Cipher.getInstance(mode);
+            if ("RSA".equals(mode)) _cipher.init(Cipher.DECRYPT_MODE, _key);
+            else  _cipher.init(Cipher.DECRYPT_MODE, _secretKey);
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException ex) {
+            System.err.println(ex);
         }
-        return cipher;
-    } 
-    private byte[] decryption(byte[] tmp, Cipher cipher) {
-        byte[] decryptedByteData = null;
-        try {
-            decryptedByteData = cipher.doFinal(tmp); // use object for decryption
-        } catch (IllegalBlockSizeException ex) {
-            Logger.getLogger(DecryptMessage.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (BadPaddingException ex) {
-            Logger.getLogger(DecryptMessage.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return decryptedByteData;
-    }
-    private byte[] concatenateByteArrays(byte[] a, byte[] b) {
-        byte[] result = new byte[a.length + b.length]; 
-        System.arraycopy(a, 0, result, 0, a.length); 
-        System.arraycopy(b, 0, result, a.length, b.length); 
-        return result;
     }
     
-    public byte[] decrypt(){
-        byte[] tmp;
-        byte[] result = new byte[0];
-        Cipher cipher = initCipher();
+    public Message decrypt(boolean symetric){
+        _size = (symetric) ? _SIZEAES : _SIZERSA;
+        if (symetric) this.initCipher("AES/ECB/PKCS5Padding");
+        else this.initCipher("RSA");
+        int n = (_message.length/_size) + (_message.length%_size == 0 ? 0 : 1);
+       
+        ByteArray tmp = new ByteArray();
+        ByteArray result = new ByteArray();
         
-        int n = message.length/SIZECONSTANT;
-        if (message.length % SIZECONSTANT != 0) n += 1;
         for (int i = 0; i < n; i++){
-            if (i != n-1) tmp = Arrays.copyOfRange(message, i*SIZECONSTANT, (i+1)*SIZECONSTANT);
-            else tmp = Arrays.copyOfRange(message, i*SIZECONSTANT, message.length);
-            result = concatenateByteArrays(result, decryption(tmp,cipher));
+            int start = i*_size;
+            int end = (i != n-1) ? (i+1)*_size : _message.length;
+            tmp.copyOfRange(_message, start, end);
+            tmp.decryption(_cipher);
+            result.concatenateByteArrays(tmp.getArray());
         }
-        return result;
+        return (Message) SerializationUtils.deserialize(result.getArray());
     }
     
     public void setValues(byte[] m, Key n){
-        message = m;
-        key = n;
+        _message = m;
+        _key = n;
+    }
+    
+    public void setValues(byte[] m, SecretKey n) {
+        _message = m;
+        _secretKey = n;
     }
     
     public DecryptMessage(byte[] m, Key k) {
-        message = m;
-        key = k;
+        _message = m;
+        _key = k;
     }
     
     public DecryptMessage(){}

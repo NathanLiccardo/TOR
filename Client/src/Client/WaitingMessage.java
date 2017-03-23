@@ -6,6 +6,8 @@
 package Client;
 
 import GUI.MainFrame;
+import Message.Message;
+import Message.SerializationUtils;
 import MessageTransfert.ReceiveMessage;
 
 import java.io.IOException;
@@ -29,20 +31,20 @@ public class WaitingMessage extends Thread{
         server = new ServerSocket(p, 100, add); 
         gui = mf;
     }
-
-    @Override
-    public void run() {
-        while (isRunning) {
-            try {
-                Thread t1 = new Thread(new Receive(server.accept(), gui));
-                t1.start();
-            } catch (IOException ex) {
-                Logger.getLogger(WaitingMessage.class.getName()).log(Level.SEVERE, null, ex);
-            }
+    
+    private void startChildThread() {
+        try {
+            Thread t1 = new Thread(new Receive(server.accept(), gui));
+            t1.start();
+        } catch (IOException ex) {
+            Logger.getLogger(WaitingMessage.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
     public void stopThread() { isRunning = false; }
+
+    @Override
+    public void run() { while (isRunning) startChildThread(); }
     
 }
 
@@ -52,21 +54,27 @@ class Receive implements Runnable {
     private String msg;
     private MainFrame gui;
     
+    public Receive(Socket socket, MainFrame mf) throws IOException {
+        rm = new ReceiveMessage(socket);
+        gui = mf;
+    }
+    
     private void printMessage() {
         System.out.println("Message reçu : ");
         System.out.println(msg);
         System.out.println("Veuillez entrer votre message");
     }
     
-    public Receive(Socket socket, MainFrame mf) throws IOException {
-        rm = new ReceiveMessage(socket);
-        gui = mf;
+    private void transformMessage() {
+        Message message = rm.receiveMessage();
+        byte[] byteArray = message.getMessage();
+        msg = new String(byteArray);
+        gui.updateScrollPane(msg);
     }
-
+    
     @Override
     public void run() {
-        msg = new String(rm.receiveMessage().getMessage());
-        gui.updateScrollPane("Reçu : \n"+msg);
+        transformMessage();
         printMessage();
     }
     
