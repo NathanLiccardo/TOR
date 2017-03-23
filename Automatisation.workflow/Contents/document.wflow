@@ -51,7 +51,7 @@
 				<key>ActionParameters</key>
 				<dict>
 					<key>source</key>
-					<string>on run {input, parameters}		tell application "Terminal"		reopen		activate		do script with command "java -jar Documents/BA3/INFOF308/TOR/Server/dist/Server.jar"		delay 3	end tell		tell application "Terminal"		activate		do script with command "java -jar Documents/BA3/INFOF308/TOR/Node/dist/Node.jar"		delay 1	end tell	tell application "Terminal"		activate		do script with command "java -jar Documents/BA3/INFOF308/TOR/Node/dist/Node.jar"		delay 1	end tell	tell application "Terminal"		activate		do script with command "java -jar Documents/BA3/INFOF308/TOR/Node/dist/Node.jar"		delay 1	end tell		tell application "Terminal"		activate		delay 2		set currentTab1 to do script "java -jar Documents/BA3/INFOF308/TOR/Client/dist/Client.jar"		set currentTab2 to do script "java -jar Documents/BA3/INFOF308/TOR/Client/dist/Client.jar"		delay 2		do script "2005" in currentTab1		do script "2006" in currentTab2		delay 2		do script "2006" in currentTab1		do script "2005" in currentTab2	end tell		return inputend run</string>
+					<string>on run {input, parameters}		tell application "Terminal"		reopen		activate		do script with command "java -jar Documents/BA3/INFOF308/TOR/Server/dist/Server.jar"		delay 3	end tell		tell application "Terminal"		activate		do script with command "java -jar Documents/BA3/INFOF308/TOR/Node/dist/Node.jar"		delay 1	end tell	tell application "Terminal"		activate		do script with command "java -jar Documents/BA3/INFOF308/TOR/Node/dist/Node.jar"		delay 1	end tell	tell application "Terminal"		activate		do script with command "java -jar Documents/BA3/INFOF308/TOR/Node/dist/Node.jar"		delay 1	end tell		tell application "Terminal"		activate		delay 2		set currentTab1 to do script "java -jar Documents/BA3/INFOF308/TOR/Client/dist/Client.jar"		set currentTab2 to do script "java -jar Documents/BA3/INFOF308/TOR/Client/dist/Client.jar"		delay 2		do script "2005" in currentTab1		delay 1		do script "2006" in currentTab2		delay 2		do script "2006" in currentTab1		do script "2005" in currentTab2	end tell		return inputend run</string>
 				</dict>
 				<key>BundleIdentifier</key>
 				<string>com.apple.Automator.RunScript</string>
@@ -105,7 +105,7 @@ end run</string>
 				<key>isViewVisible</key>
 				<true/>
 				<key>location</key>
-				<string>507.000000:567.000000</string>
+				<string>563.500000:300.000000</string>
 				<key>nibPath</key>
 				<string>/System/Library/Automator/Run AppleScript.action/Contents/Resources/Base.lproj/main.nib</string>
 			</dict>

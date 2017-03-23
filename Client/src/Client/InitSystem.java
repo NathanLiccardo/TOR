@@ -43,11 +43,17 @@ public class InitSystem {
         }
     }
     
-    public Node getClient() throws UnknownHostException {
+    public Node getClient() {
         System.out.println("Avec quel port voulez-vous communiquer ?");
         Scanner in = new Scanner(System.in);
         int portLocal = in.nextInt();
-        return new Node(InetAddress.getByName("localhost"),portLocal);
+        Node client = null;
+        try {
+            client = new Node(InetAddress.getByName("localhost"),portLocal);
+        } catch (UnknownHostException ex) {
+            System.out.println(ex);
+        }
+        return client;
     }
     
 }

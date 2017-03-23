@@ -24,7 +24,7 @@ public class CreateMessage {
     
     public void creation(String m, ArrayList<SecretKey> s){
         key = s;
-        message.setKey(m.getBytes());
+        message.setMessage(m.getBytes());
         message.setKey(null);
         message.setNode(client);
         for (int i=0; i < SIZE; i++) {

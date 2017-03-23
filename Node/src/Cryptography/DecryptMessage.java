@@ -10,8 +10,6 @@ import Message.SerializationUtils;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
@@ -22,65 +20,58 @@ import javax.crypto.SecretKey;
  */
 public class DecryptMessage {
     
-    private byte[] message;
-    private Key key;
-    private SecretKey secretKey;
+    private Key _key;
+    private int _size;
+    private Cipher _cipher;
+    private byte[] _message;
+    private SecretKey _secretKey;
     
-    private final int SIZE1 = 256;
-    private final int SIZE2 = 128;
+    private final int _SIZERSA = 256;
+    private final int _SIZEAES = 144;
     
-    private Cipher initCipherAsymetric() {
-        Cipher cipher = null;
+    private void initCipher(String mode) {
+        _cipher = null;
         try {
-            cipher = Cipher.getInstance("RSA");
-            cipher.init(Cipher.DECRYPT_MODE, key); 
+            _cipher = Cipher.getInstance(mode);
+            if ("RSA".equals(mode)) _cipher.init(Cipher.DECRYPT_MODE, _key);
+            else  _cipher.init(Cipher.DECRYPT_MODE, _secretKey);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException ex) {
-            Logger.getLogger(DecryptMessage.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println(ex);
         }
-        return cipher;
-    }
-    private Cipher initCipherSymetric() {
-        Cipher cipher = null;
-        try {
-            cipher = Cipher.getInstance("AES"); 
-            cipher.init(Cipher.DECRYPT_MODE, secretKey); 
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException ex) {
-            Logger.getLogger(DecryptMessage.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return cipher;
     }
     
     public Message decrypt(boolean symetric){
-        int SIZE = (symetric) ? SIZE2 : SIZE1;
-        Cipher cipher = (symetric) ? initCipherSymetric() : initCipherAsymetric();
-        int n = (message.length/SIZE) + (message.length%SIZE == 0 ? 0 : 1);
-        
+        _size = (symetric) ? _SIZEAES : _SIZERSA;
+        if (symetric) this.initCipher("AES/ECB/PKCS5Padding");
+        else this.initCipher("RSA");
+        int n = (_message.length/_size) + (_message.length%_size == 0 ? 0 : 1);
+       
         ByteArray tmp = new ByteArray();
         ByteArray result = new ByteArray();
         
         for (int i = 0; i < n; i++){
-            int start = i*SIZE;
-            int end = (i != n-1) ? (i+1)*SIZE : message.length;
-            tmp.copyOfRange(message, start, end);
-            tmp.decryption(cipher);
+            int start = i*_size;
+            int end = (i != n-1) ? (i+1)*_size : _message.length;
+            tmp.copyOfRange(_message, start, end);
+            tmp.decryption(_cipher);
             result.concatenateByteArrays(tmp.getArray());
         }
         return (Message) SerializationUtils.deserialize(result.getArray());
     }
     
     public void setValues(byte[] m, Key n){
-        message = m;
-        key = n;
+        _message = m;
+        _key = n;
     }
     
     public void setValues(byte[] m, SecretKey n) {
-        message = m;
-        secretKey = n;
+        _message = m;
+        _secretKey = n;
     }
     
     public DecryptMessage(byte[] m, Key k) {
-        message = m;
-        key = k;
+        _message = m;
+        _key = k;
     }
     
     public DecryptMessage(){}

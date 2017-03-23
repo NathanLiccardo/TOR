@@ -68,7 +68,7 @@ class Receive implements Runnable {
     private void transformMessage() {
         Message message = rm.receiveMessage();
         byte[] byteArray = message.getMessage();
-        msg = (String) SerializationUtils.deserialize(byteArray);
+        msg = new String(byteArray);
         gui.updateScrollPane(msg);
     }
     

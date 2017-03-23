@@ -13,8 +13,6 @@ import java.net.Socket;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
@@ -93,7 +91,7 @@ public class Circuit {
                 keys.add(secretKey);
             }
         } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(Circuit.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println(ex);
         }
     }
     
@@ -119,7 +117,7 @@ public class Circuit {
             socket = new Socket(node.getIp(),node.getPort());
             sendMessage = new SendMessage(socket);
         } catch (IOException ex) {
-            Logger.getLogger(Circuit.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println(ex);
         }
     }
     
@@ -127,7 +125,7 @@ public class Circuit {
         try {
             socket.close();
         } catch (IOException ex) {
-            Logger.getLogger(Circuit.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println(ex);
         }
     }
     

@@ -53,7 +53,7 @@ public class CryptMessage {
     private Cipher initCipherSymetric() {
         Cipher cipher = null;
         try {
-            cipher = Cipher.getInstance("AES");
+            cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
             return cipher;
         } catch (NoSuchAlgorithmException ex) {
