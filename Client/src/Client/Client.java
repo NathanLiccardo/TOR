@@ -5,20 +5,14 @@
  */
 package Client;
 
-import GUI.MainFrame;
+import java.io.IOException;
 
 /**
- *
  * @author Nathan
  */
 public class Client {
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         InitSystem init = new InitSystem();
-        init.getPort();
-        init.initThreads();
     }
 }

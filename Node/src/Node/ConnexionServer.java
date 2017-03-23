@@ -10,7 +10,6 @@ import MessageTransfert.SendMessage;
 import java.io.IOException;
 import java.net.Socket;
 import java.security.Key;
-import java.security.KeyPairGenerator;
 
 /**
  *
