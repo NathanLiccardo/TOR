@@ -7,77 +7,62 @@ package Client;
 
 import GUI.MainFrame;
 import Message.Message;
-import Message.SerializationUtils;
 import MessageTransfert.ReceiveMessage;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author Nathan
  */
 public class WaitingMessage extends Thread{
+    private ServerSocket _server;
+    private final MainFrame _mainFrame;
     
-    private final ServerSocket server;
-    private Boolean isRunning = true;
-    private MainFrame gui;
-    
-    public WaitingMessage(InetAddress add, int p, MainFrame mf) throws IOException{
-        server = new ServerSocket(p, 100, add); 
-        gui = mf;
-    }
-    
-    private void startChildThread() {
-        try {
-            Thread t1 = new Thread(new Receive(server.accept(), gui));
-            t1.start();
+    public WaitingMessage(InetAddress add, int port, MainFrame mainFrame){
+        _mainFrame = mainFrame;
+        try { 
+            _server = new ServerSocket(port, 100, add);
         } catch (IOException ex) {
-            Logger.getLogger(WaitingMessage.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println(ex);
         }
     }
     
-    public void stopThread() { isRunning = false; }
-
     @Override
-    public void run() { while (isRunning) startChildThread(); }
+    public void run() { 
+        while (true) {
+            try {
+                new Thread(new Receive(_server.accept(), _mainFrame)).start();
+            } catch (IOException ex) {
+                System.err.println(ex);
+            }
+        }
+    }
     
 }
 
 class Receive implements Runnable {
+    private String _message;
+    private MainFrame _mainFrame;
+    private ReceiveMessage _receiveMessage;
     
-    private ReceiveMessage rm;
-    private String msg;
-    private MainFrame gui;
-    
-    public Receive(Socket socket, MainFrame mf) throws IOException {
-        rm = new ReceiveMessage(socket);
-        gui = mf;
-    }
-    
-    private void printMessage() {
-        System.out.println("Message reçu : ");
-        System.out.println(msg);
-        System.out.println("Veuillez entrer votre message");
-    }
-    
-    private void transformMessage() {
-        Message message = rm.receiveMessage();
-        byte[] byteArray = message.getMessage();
-        msg = new String(byteArray);
-        gui.updateScrollPane(msg);
+    public Receive(Socket socket, MainFrame mainFrame) {
+        _mainFrame = mainFrame;
+        try {
+            _receiveMessage = new ReceiveMessage(socket);
+        } catch (IOException ex) {
+            System.err.println(ex);
+        }
     }
     
     @Override
     public void run() {
-        transformMessage();
-        printMessage();
+        Message message = _receiveMessage.receiveMessage();
+        byte[] byteArray = message.getMessage();
+        _message = new String(byteArray);
+        _mainFrame.updateScrollPane(_message);
     }
-    
-    public String getMessage() { return msg; }
-    
 }
