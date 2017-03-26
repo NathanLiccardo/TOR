@@ -5,53 +5,34 @@
  */
 package Node;
 
+import Cryptography.PrivateKeyReader;
+import Cryptography.PublicKeyReader;
 import NodeExecution.ReceptionThread;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.security.Key;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author Nathan
  */
 public class Main {
-    
-    private static InetAddress addres;
-    private static Key privateK;
-    private static Key publicK;
-    
-    private static KeyPairGenerator keyGen() {
-        KeyPairGenerator generator = null;
-        try { 
-            generator = KeyPairGenerator.getInstance("RSA");
-        } 
-        catch (NoSuchAlgorithmException ex) { 
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return generator;
-    }
-    private static void initKey(KeyPairGenerator generator) {
-        generator.initialize(2048);
-        KeyPair keyPair = generator.generateKeyPair();
-        privateK = keyPair.getPrivate();
-        publicK = keyPair.getPublic();
-    }
+    private static Key _publicKey;
+    private static Key _privateKey;
+    private static InetAddress _address;
 
     /**
-     * @param args the command line arguments
+     * @param args
+     * @throws java.net.UnknownHostException
      */
-    public static void main(String[] args) throws IOException {
-        addres = InetAddress.getByName("localhost");
-        initKey(keyGen());
-        
-        ConnexionServer connexion = new ConnexionServer(publicK);
-        ReceptionThread reception = new ReceptionThread(connexion.getNumber(),addres,privateK);
-        new Thread(reception).start();
+    public static void main(String[] args) throws UnknownHostException, IOException{
+        System.out.println(args[0]);
+        _address = InetAddress.getByName(args[0]);
+        _privateKey = new PrivateKeyReader().get(args[1]);
+        _publicKey = new PublicKeyReader().get(args[2]);
+        ConnexionServer connexion = new ConnexionServer(_publicKey);
+        new Thread(new ReceptionThread(connexion.getNumber(),_address,_privateKey)).start();
     }
     
 }
