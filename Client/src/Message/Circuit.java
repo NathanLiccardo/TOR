@@ -67,10 +67,12 @@ public class Circuit {
         byte[] byteMessage = null;
         keys.add(SIZE, null); nodes.add(0, null);
         message = new Message(byteMessage, SerializationUtils.serialize((keys.get(0))), nodes.get(0), 0);
+        String encodedKey = Base64.getEncoder().encodeToString(keys.get(0).getEncoded());
+        System.out.println("Key : "+encodedKey+" ("+0+")");
         for (int i=1; i<SIZE+1; i++){
             crypt.setValues(message, nodes.get(i));
             message = new Message(crypt.crypt(false), SerializationUtils.serialize(keys.get(i)), nodes.get(i), i);
-            String encodedKey = null;
+            encodedKey = null;
             if (i != SIZE) encodedKey = Base64.getEncoder().encodeToString(keys.get(i).getEncoded());
             if (i != SIZE) System.out.println("Key : "+encodedKey+" ("+i+")");
         }

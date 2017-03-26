@@ -48,13 +48,18 @@ class Receive implements Runnable {
     private String _message;
     private MainFrame _mainFrame;
     private ReceiveMessage _receiveMessage;
+    private int COUNTER = 4;
     
     @Override
     public void run() {
-        Message message = _receiveMessage.receiveMessage();
-        byte[] byteArray = message.getMessage();
-        _message = new String(byteArray);
-        _mainFrame.updateScrollPane(_message);
+        while (COUNTER > 0) {
+            Message message = _receiveMessage.receiveMessage();
+            System.out.println("Message Received !");
+            byte[] byteArray = message.getMessage();
+            _message = new String(byteArray);
+            _mainFrame.updateScrollPane(_message);
+            COUNTER--;
+        }
     }
     
     public Receive(Socket socket, MainFrame mainFrame) {

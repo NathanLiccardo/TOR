@@ -79,10 +79,6 @@ class Reception implements Runnable {
         }
     }
     
-    private void sendMessage() {
-        _sendMessage.sendMessage(_message);
-    }
-    
     private void getMessage() {
         _message = _receiveMessage.receiveMessage();
         _decryption.setValues(_message.getMessage(), _secretKey);
@@ -91,7 +87,7 @@ class Reception implements Runnable {
     
     private void getKey() {
         _message = _receiveMessage.receiveMessage();
-        System.out.println(_message.getNum());
+        System.out.print(_message.getNum());
         _decryption.setValues(_message.getMessage(), _key);
         _message = _decryption.decrypt(false);
         _secretKey = (SecretKey) SerializationUtils.deserialize(_message.getKey());
@@ -102,6 +98,7 @@ class Reception implements Runnable {
     
     private void receiveMessage() {
         this.getMessage();
+        System.out.print("Message Received");
         this.sendNext();
         COUNTER--;
     }
@@ -110,7 +107,10 @@ class Reception implements Runnable {
         if (_message.getNode() != null) {
             _nextNode = _message.getNode();
             if (_sendMessage == null) openCommunication();
-            sendMessage();
+            _sendMessage.sendMessage(_message);
+            System.out.println(" -> Message Sended");
+        } else {
+            System.out.println(" -> Last Node");
         }
     }
     

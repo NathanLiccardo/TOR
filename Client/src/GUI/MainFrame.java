@@ -55,7 +55,7 @@ public class MainFrame extends JFrame implements ActionListener {
         this.add(new JLabel("Votre message : "),_gridConstraints);
         setGridConstraints(0, 3, 1., 0, 3, -1, GridBagConstraints.HORIZONTAL, GridBagConstraints.LINE_START, new Insets(10, 15, 5, 10));
         this.add(_textField, _gridConstraints);
-        setGridConstraints(3, 4, 0., -1, -1, -1, GridBagConstraints.NONE, GridBagConstraints.BASELINE, new Insets(10, 3, 5, 10));
+        setGridConstraints(3, 3, 0., -1, -1, -1, GridBagConstraints.NONE, GridBagConstraints.BASELINE, new Insets(10, 3, 5, 10));
         JButton sendButton = new JButton("Envoi");
         sendButton.addActionListener(this);
         this.add(sendButton, _gridConstraints);
