@@ -13,47 +13,42 @@ import java.io.Serializable;
  * @author Nathan
  */
 public class Message implements Serializable{
+    private int _val;
+    private Node _next;
+    private byte[] _key;
+    private byte[] _message;
     
-    private byte[] message;
-    private byte[] key;
-    private Node next;
-    
-    public Message(byte[] m, byte[] k, Node n) {
-        message = m;
-        key = k;
-        next = n;
+    public Message(byte[] m, byte[] k, Node n, int num) {
+        _key = k;
+        _next = n;
+        _val = num;
+        _message = m;
     }
     
     public byte[] getMessage() {
-        return message;
+        return _message;
     }
-    
-    public void setMessage(byte[] m) {
-        message = m;
-    }
-    
     public Node getNode() {
-        return next;
+        return _next;
     }
-    
-    public void setNode(Node n) {
-        next = n;
-    }
-    
     public byte[] getKey(){
-        return key;
-    }
-    
-    public void setKey(byte[] k) {
-        key = k;
-    }
-    
-    private int _val = -1;
-    public void setNum(int num) {
-        _val = num;
+        return _key;
     }
     public int getNum() {
         return _val;
+    }
+    
+    public void setMessage(byte[] m) {
+        _message = m;
+    }
+    public void setNode(Node n) {
+        _next = n;
+    }
+    public void setKey(byte[] k) {
+        _key = k;
+    }
+    public void setNum(int num) {
+        _val = num;
     }
     
 }

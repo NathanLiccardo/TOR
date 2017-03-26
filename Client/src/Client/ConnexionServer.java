@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Client;
 
 import java.io.IOException;
@@ -13,64 +8,32 @@ import MessageTransfert.SendMessage;
 import Node.Node;
 
 /**
- *
  * @author Nathan
- * Permet de se connecter au serveur et d'obtenir la liste des noeuds existants.
+ * Récupère la liste des noeuds sur le serveur
  */
 public class ConnexionServer {
+    private final String _host;
+    private final Socket _connect;
+    private ArrayList<Node> _nodes;
+    private final static int PORT = 2000;
+    private final SendMessage _sendMessage;
+    private final ReceiveMessage _receiveMessage;
     
-    // Informations de connexion au serveur.
-    private int port = 2000;
-    private String host = "localhost";
-    
-    // Echange de messages
-    private Socket connect;
-    private ReceiveMessage rm;
-    private SendMessage sm;
-    
-    // Liste des noeuds
-    private ArrayList<Node> node;
-    
-    /**
-     * Connexion au serveur
-     * @throws IOException 
-     */
-    private void initExchange() throws IOException {
-        connect = new Socket(host, port);
-        sm = new SendMessage(connect);
-        rm = new ReceiveMessage(connect);
+    private void connection() throws IOException {
+        _sendMessage.sendInt(0);
+        _nodes = _receiveMessage.receiveNodeList();
+        _connect.close();
     }
-    
-    /**
-     * Envoi de l'info client au serveur
-     */
-    private void connectAsClient() {
-        sm.sendInt(0);
-        node = rm.receiveNodeList();
-    }
-    
-    /**
-     * Fermerture de la connexion
-     * @throws IOException 
-     */
-    private void closeConnection() throws IOException {
-        connect.close();
-    }
-    
-    /**
-     * Constructeur
-     * @throws IOException 
-     */
-    public ConnexionServer() throws IOException{
-        initExchange();
-        connectAsClient();
-        closeConnection();
-    }
-    
-    /**
-     * @return Nodes
-     */
+     
     public ArrayList<Node> getNodes(){
-        return node;
+        return _nodes;
+    }
+    
+    public ConnexionServer() throws IOException{
+        _host = "localhost";
+        _connect = new Socket(_host, PORT);
+        _sendMessage = new SendMessage(_connect);
+        _receiveMessage = new ReceiveMessage(_connect);
+        this.connection();
     }
 }

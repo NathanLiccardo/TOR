@@ -11,8 +11,6 @@ import Node.Node;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
@@ -22,83 +20,56 @@ import javax.crypto.SecretKey;
  * @author Nathan
  */
 public class CryptMessage {
-    
-    private byte[] message;
-    private Node node;
-    private Key key;
-    private SecretKey secretKey;
+    private Key _key;
+    private Node _node;
+    private byte[] _message;
+    private SecretKey _secretKey;
     
     private final int SIZE1 = 245;
     private final int SIZE2 = 128;
     
-    public CryptMessage(byte[] m,Node n) {
-        message = m;
-        node = n;
-        key = node.getKey();
-    }
-    
-    public CryptMessage(){}
-    
-    private Cipher initCipherAsymetric() {
+    private Cipher initCipher (String text, boolean symetric) {
         Cipher cipher = null;
-        try {
-            cipher = Cipher.getInstance("RSA");
-            cipher.init(Cipher.ENCRYPT_MODE, key);
+        try{
+            cipher = Cipher.getInstance(text);
+            if (symetric) cipher.init(Cipher.ENCRYPT_MODE, _secretKey);
+            else cipher.init(Cipher.ENCRYPT_MODE, _key);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException ex) {
-            Logger.getLogger(CryptMessage.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return cipher;
-    }
-    
-    private Cipher initCipherSymetric() {
-        Cipher cipher = null;
-        try {
-            cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-            return cipher;
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(CryptMessage.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NoSuchPaddingException ex) {
-            Logger.getLogger(CryptMessage.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InvalidKeyException ex) {
-            Logger.getLogger(CryptMessage.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println(ex);
         }
         return cipher;
     }
     
     public byte[] crypt(boolean symetric) {
-        int SIZE = symetric ? SIZE2 : SIZE1;
-        Cipher cipher = symetric ? this.initCipherSymetric() : this.initCipherAsymetric();
+        String texte = (symetric) ? "AES/ECB/PKCS5Padding" : "RSA";
+        Cipher cipher = this.initCipher(texte, symetric);
+        int size = symetric ? SIZE2 : SIZE1;
         
         ByteArray tmp = new ByteArray();
         ByteArray result = new ByteArray();
         
-        int n = (message.length/SIZE) + ((message.length%SIZE!=0) ? 1 : 0);
-        
-        for (int i = 0; i < n; i++){
-            int start = i*SIZE;
-            int end = (i+1)*SIZE;
-            tmp.copyOfRange(message,start,end);
-            tmp.encryption(cipher);
+        for (int i = 0; i < (_message.length/size); i++){
+            tmp.copyOfRange(_message,i*size,(i+1)*size);
+            tmp.action(cipher);
             result.concatenateByteArrays(tmp.getArray());
         }
-        if (message.length%SIZE!=0){
-            tmp.copyOfRange(message, (n-1)*SIZE, message.length);
-            tmp.encryption(cipher);
+        if (_message.length%size!=0){
+            tmp.copyOfRange(_message, (_message.length/size)*size, _message.length);
+            tmp.action(cipher);
             result.concatenateByteArrays(tmp.getArray());
         }
         return result.getArray();
     }
     
     public void setValues(Message m, Node n) {
-        message = SerializationUtils.serialize(m);
-        node = n;
-        key = node.getKey();
+        _message = SerializationUtils.serialize(m);
+        _node = n;
+        _key = _node.getKey();
     }
     
     public void setValues(Message m, SecretKey k) {
-        message = SerializationUtils.serialize(m);
-        secretKey = k;
+        _message = SerializationUtils.serialize(m);
+        _secretKey = k;
     }
    
 }

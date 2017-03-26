@@ -1,18 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Client;
 
 import GUI.MainFrame;
 import Node.Node;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -20,40 +12,26 @@ import java.util.logging.Logger;
  */
 public class InitSystem {
     
-    private int port = 0;
+    private int port;
     
-    public InitSystem() {}
-    
-    public void getPort() {
-        System.out.println("Sur quel port voulez-vous être visible ?");
+    private int getPort(String text) {
+        System.out.println(text);
         Scanner in = new Scanner(System.in);
-        port = in.nextInt();
+        return in.nextInt();
     }
     
-    public void initThreads() {
-        try {
-            ConnexionServer connexion = new ConnexionServer();
-            SendingMessage send = new SendingMessage(getClient(),connexion.getNodes());
-            MainFrame gui = new MainFrame(send);
-            WaitingMessage wait = new WaitingMessage(InetAddress.getByName("localhost"),port,gui);
-            Thread t1 = new Thread(wait);
-            t1.start();
-        } catch (IOException ex) {
-            Logger.getLogger(InitSystem.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    private void initThreads() throws IOException {
+        port = this.getPort("Sur quel port souhaitez-vous être visible ?");
+        int portLocal = this.getPort("Avec quel port voulez-vous communiquer ?");
+        Node client = new Node(InetAddress.getByName("localhost"),portLocal);
+        ConnexionServer connexion = new ConnexionServer();
+        SendingMessage send = new SendingMessage(client,connexion.getNodes());
+        new Thread(new WaitingMessage(InetAddress.getByName("localhost"),port,new MainFrame(send))).start();
     }
     
-    public Node getClient() {
-        System.out.println("Avec quel port voulez-vous communiquer ?");
-        Scanner in = new Scanner(System.in);
-        int portLocal = in.nextInt();
-        Node client = null;
-        try {
-            client = new Node(InetAddress.getByName("localhost"),portLocal);
-        } catch (UnknownHostException ex) {
-            System.out.println(ex);
-        }
-        return client;
+    public InitSystem() throws IOException {
+        this.port = 0;
+        this.initThreads();
     }
     
 }
