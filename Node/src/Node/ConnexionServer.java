@@ -9,7 +9,7 @@ import MessageTransfert.ReceiveMessage;
 import MessageTransfert.SendMessage;
 import java.io.IOException;
 import java.net.Socket;
-import java.security.Key;
+import java.security.PublicKey;
 
 /**
  *
@@ -17,13 +17,13 @@ import java.security.Key;
  */
 public class ConnexionServer {
     private Socket connect = null;
-    private String HOST = "localhost";
-    private int PORT = 2000;
-    private int number;
-    private ReceiveMessage rm;
-    private SendMessage sm;
+    private final String HOST = "localhost";
+    private final int PORT = 2000;
+    private final int number;
+    private final ReceiveMessage rm;
+    private final SendMessage sm;
     
-    public ConnexionServer(Key key) throws IOException {
+    public ConnexionServer(PublicKey key) throws IOException {
         connect = new Socket(HOST, PORT);
         sm = new SendMessage(connect);
         rm = new ReceiveMessage(connect);

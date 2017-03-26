@@ -9,7 +9,7 @@ import Message.Message;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.security.Key;
+import java.security.PublicKey;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,7 +43,7 @@ public class SendMessage {
         }
     }
     
-    public void sendKey(Key key) {
+    public void sendKey(PublicKey key) {
         try {
             output.writeObject(key);
             output.flush();

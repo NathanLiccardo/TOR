@@ -11,15 +11,16 @@ import NodeExecution.ReceptionThread;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.security.Key;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 
 /**
  *
  * @author Nathan
  */
 public class Main {
-    private static Key _publicKey;
-    private static Key _privateKey;
+    private static PublicKey _publicKey;
+    private static PrivateKey _privateKey;
     private static InetAddress _address;
 
     /**

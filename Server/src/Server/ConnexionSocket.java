@@ -11,7 +11,6 @@ import MessageTransfert.ReceiveMessage;
 import MessageTransfert.SendMessage;
 import java.io.IOException;
 import Node.Node;
-import java.security.Key;
 
 
 /**
@@ -19,14 +18,13 @@ import java.security.Key;
  * @author Nathan
  */
 public class ConnexionSocket implements Runnable{
-    private Socket client; 
-    private ArrayList<Node> node;
-    private ReceiveMessage rm;
-    private SendMessage sm;
-    private int ServerPort;
+    private final Socket client;    
+    private final int ServerPort;
+    private final SendMessage sm;
+    private final ReceiveMessage rm;
+    private final ArrayList<Node> node;
     
     public ConnexionSocket(Socket C, int SPort, ArrayList<Node> N) throws IOException{
-        System.out.print("Client connecté : ");
         client = C;
         node = N;
         ServerPort = SPort;
@@ -37,11 +35,11 @@ public class ConnexionSocket implements Runnable{
     @Override
     public void run() {
         int type = rm.receiveInt();
-        if (type == 0) { // Client
-            System.out.println("Client connecté");
+        if (type == 0) {
+            System.out.println("-> Client connecté");
             sm.sendNodeList(node);
-        } else { // Noeud
-            System.out.println("Noeud connecté");
+        } else {
+            System.out.println("-> Noeud connecté");
             int nodePort = ServerPort+node.size()+1;
             node.add(new Node(client,nodePort,rm.receiveKey()));
             sm.sendInt(nodePort);

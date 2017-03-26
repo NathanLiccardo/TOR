@@ -25,7 +25,7 @@ public class CryptMessage {
     private byte[] _message;
     private SecretKey _secretKey;
     
-    private final int SIZE1 = 245;
+    private final int SIZE1 = 53;
     private final int SIZE2 = 128;
     
     private Cipher initCipher (String text, boolean symetric) {

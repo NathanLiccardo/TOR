@@ -12,7 +12,7 @@ package Server;
 public class Server {
     
     public static void main(String args[]){
-        ListenSocket listen = new ListenSocket();
+        new ListenSocket();
     }
     
 }

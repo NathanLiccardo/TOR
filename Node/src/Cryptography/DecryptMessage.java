@@ -26,7 +26,7 @@ public class DecryptMessage {
     private byte[] _message;
     private SecretKey _secretKey;
     
-    private final int _SIZERSA = 256;
+    private final int _SIZERSA = 64;
     private final int _SIZEAES = 144;
     
     private void initCipher(String mode) {

@@ -8,7 +8,6 @@ package Server;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.UnknownHostException;
 import Node.Node;
 import java.util.ArrayList;
@@ -25,40 +24,34 @@ public class ListenSocket {
     public ListenSocket(){
         try {
             server = new ServerSocket(port, 100,InetAddress.getByName(host));
-            Thread start = new Thread(new Connexion(server,port));
-            start.start();
+            new Thread(new Connexion(server,port)).start();
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            System.err.println(e);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println(e);
         }
     }
     
 }
 
 class Connexion implements Runnable {
-    private ServerSocket serverSocket = null;
-    private Socket socket = null;
-    public ArrayList<Node> node = new ArrayList<Node>();
-    public Thread cl;
-    private int port;
-    
-    // Création du serveur
-    public Connexion(ServerSocket s, int ServerPort){
-        serverSocket = s;
-        port = ServerPort;
-    }
+    private final int port;
+    private final ServerSocket serverSocket;
+    public ArrayList<Node> node = new ArrayList<>();
 
     @Override
     public void run() {
         while (true){
             try {
-                socket = serverSocket.accept();
-                cl = new Thread(new ConnexionSocket(socket, port,node));
-                cl.start();
+                new Thread(new ConnexionSocket(serverSocket.accept(), port,node)).start();
             } catch (IOException ex) {
-                System.out.println("Erreur : création du thread");
+                System.err.println(ex);
             }
         }
+    }
+    
+    public Connexion(ServerSocket s, int ServerPort){
+        serverSocket = s;
+        port = ServerPort;
     }
 }

@@ -11,8 +11,6 @@ import java.io.ObjectInputStream;
 import java.net.Socket;
 import Node.Node;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -28,10 +26,8 @@ public class ReceiveMessage {
     public ArrayList<Node> receiveNodeList(){
         try {
             return (ArrayList<Node>) input.readObject();
-        } catch (IOException ex) {
-            Logger.getLogger(ReceiveMessage.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(ReceiveMessage.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException | ClassNotFoundException ex) {
+            System.err.println(ex);
         }
         return null;
     }
@@ -39,10 +35,8 @@ public class ReceiveMessage {
     public Message receiveMessage() {
         try {
             return (Message) input.readObject();
-        } catch (IOException ex) {
-            Logger.getLogger(ReceiveMessage.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(ReceiveMessage.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException | ClassNotFoundException ex) {
+            System.err.println(ex);
         }
         return null;
     }

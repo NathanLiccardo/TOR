@@ -8,7 +8,7 @@ package Node;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.security.Key;
+import java.security.PublicKey;
 
 /**
  *
@@ -17,14 +17,14 @@ import java.security.Key;
 public class Node implements Serializable{
     InetAddress ip = null;
     Integer port = null;
-    Key key;
+    PublicKey key;
     
     public Node(InetAddress ipAddress, Integer p) {
         ip = ipAddress;
         port = p;
     }
     
-    public Node(Socket s, int nodePort, Key k){
+    public Node(Socket s, int nodePort, PublicKey k){
         ip = s.getInetAddress();
         port = nodePort;
         key = k;
@@ -46,7 +46,7 @@ public class Node implements Serializable{
         return port;
     }
     
-    public Key getKey() {
+    public PublicKey getKey() {
         return key;
     }
     

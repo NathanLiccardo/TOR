@@ -8,9 +8,7 @@ package MessageTransfert;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
-import java.security.Key;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.security.PublicKey;
 
 /**
  *
@@ -23,7 +21,7 @@ public class ReceiveMessage {
         try {
             input = new ObjectInputStream(socket.getInputStream());
         } catch (IOException ex) {
-            Logger.getLogger(ReceiveMessage.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println(ex);
         }
     }
     
@@ -32,19 +30,17 @@ public class ReceiveMessage {
         try {
             value =  input.readInt();
         } catch (IOException ex) {
-            System.out.println("Erreur : lecture int");
+            System.err.println(ex);
         }
         return value;
     }
     
-    public Key receiveKey(){
-        Key key = null;
+    public PublicKey receiveKey(){
+        PublicKey key = null;
         try {
-            key = (Key) input.readObject();
-        } catch (IOException ex) {
-            Logger.getLogger(ReceiveMessage.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(ReceiveMessage.class.getName()).log(Level.SEVERE, null, ex);
+            key = (PublicKey) input.readObject();
+        } catch (IOException | ClassNotFoundException ex) {
+            System.err.println(ex);
         }
         return key;
     }
