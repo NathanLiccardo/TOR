@@ -22,15 +22,6 @@ public class WaitingMessage extends Thread{
     private ServerSocket _server;
     private final MainFrame _mainFrame;
     
-    public WaitingMessage(InetAddress add, int port, MainFrame mainFrame){
-        _mainFrame = mainFrame;
-        try { 
-            _server = new ServerSocket(port, 100, add);
-        } catch (IOException ex) {
-            System.err.println(ex);
-        }
-    }
-    
     @Override
     public void run() { 
         while (true) {
@@ -42,12 +33,29 @@ public class WaitingMessage extends Thread{
         }
     }
     
+    public WaitingMessage(InetAddress add, int port, MainFrame mainFrame){
+        _mainFrame = mainFrame;
+        try { 
+            _server = new ServerSocket(port, 100, add);
+        } catch (IOException ex) {
+            System.err.println(ex);
+        }
+    }
+    
 }
 
 class Receive implements Runnable {
     private String _message;
     private MainFrame _mainFrame;
     private ReceiveMessage _receiveMessage;
+    
+    @Override
+    public void run() {
+        Message message = _receiveMessage.receiveMessage();
+        byte[] byteArray = message.getMessage();
+        _message = new String(byteArray);
+        _mainFrame.updateScrollPane(_message);
+    }
     
     public Receive(Socket socket, MainFrame mainFrame) {
         _mainFrame = mainFrame;
@@ -56,13 +64,5 @@ class Receive implements Runnable {
         } catch (IOException ex) {
             System.err.println(ex);
         }
-    }
-    
-    @Override
-    public void run() {
-        Message message = _receiveMessage.receiveMessage();
-        byte[] byteArray = message.getMessage();
-        _message = new String(byteArray);
-        _mainFrame.updateScrollPane(_message);
     }
 }

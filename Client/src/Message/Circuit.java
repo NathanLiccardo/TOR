@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Random;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -21,50 +22,16 @@ import javax.crypto.SecretKey;
  * @author Nathan
  */
 public class Circuit {
-    
-    private final ArrayList<Node> nodes;
-    private ArrayList<Node> circuit;
-    private ArrayList<SecretKey> keys;
-    private Message message;
-    private final CryptMessage crypt;
-    private SendMessage sendMessage;
     private Socket socket;
+    private Message message;
+    private SendMessage sendMessage;
+    private ArrayList<Node> circuit;
+    private final CryptMessage crypt;
+    private ArrayList<SecretKey> keys;
+    private final ArrayList<Node> nodes;
     
+    private int COUNTER = 4;
     private static final int SIZE = 3;
-    private int COUNTER = 5;
-    
-    public Circuit(ArrayList<Node> n) {
-        nodes = n;
-        message = new Message(null,null,null);
-        crypt = new CryptMessage();
-    }
-    
-    public void createCircuit() {
-        chooseNodes();
-        createKey();
-        createMessageSecretKeys();
-        sendKeys();
-    }
-    
-    public ArrayList<Node> getCircuit() {
-        return circuit;
-    }
-    
-    public ArrayList<SecretKey> getSecrets() {
-        return keys;
-    }
-    
-    public SendMessage getConnection() {
-        return sendMessage;
-    }
-    
-    public void check() {
-        COUNTER--;
-        if (COUNTER == 0) {
-            closeSocket();
-            createCircuit();
-        }
-    }
     
     private void chooseNodes(){
         Random rand = new Random();
@@ -95,21 +62,19 @@ public class Circuit {
         }
     }
     
+    // -> ERROR MESSAGE
     private void createMessageSecretKeys() {
         byte[] byteMessage = null;
-        Node node = null;
-        for (int i=0; i<SIZE; i++){
-            message.setMessage(byteMessage);
-            message.setKey(SerializationUtils.serialize(keys.get(i)));
-            message.setNode(node);
-            message.setNum(i);
-            node = nodes.get(i);
-            crypt.setValues(message, node);
-            byteMessage = crypt.crypt(false);
+        keys.add(SIZE, null); nodes.add(0, null);
+        message = new Message(byteMessage, SerializationUtils.serialize((keys.get(0))), nodes.get(0), 0);
+        for (int i=1; i<SIZE+1; i++){
+            crypt.setValues(message, nodes.get(i));
+            message = new Message(crypt.crypt(false), SerializationUtils.serialize(keys.get(i)), nodes.get(i), i);
+            String encodedKey = null;
+            if (i != SIZE) encodedKey = Base64.getEncoder().encodeToString(keys.get(i).getEncoded());
+            if (i != SIZE) System.out.println("Key : "+encodedKey+" ("+i+")");
         }
-        message.setMessage(byteMessage);
-        message.setKey(null);
-        message.setNode(nodes.get(SIZE-1));
+        keys.remove(SIZE); nodes.remove(0);
     }
     
     private void initSocket(Node node) {
@@ -132,6 +97,39 @@ public class Circuit {
     private void sendKeys() {
         initSocket(message.getNode());
         sendMessage.sendMessage(message);
+    }
+    
+    public void createCircuit() {
+        chooseNodes();
+        createKey();
+        createMessageSecretKeys();
+        sendKeys();
+    }
+    
+    public void check() {
+        COUNTER--;
+        if (COUNTER == 0) {
+            closeSocket();
+            createCircuit();
+        }
+    }
+    
+    public ArrayList<Node> getCircuit() {
+        return circuit;
+    }
+    
+    public ArrayList<SecretKey> getSecrets() {
+        return keys;
+    }
+    
+    public SendMessage getConnection() {
+        return sendMessage;
+    }
+    
+    public Circuit(ArrayList<Node> n) {
+        nodes = n;
+        message = new Message(null,null,null,0);
+        crypt = new CryptMessage();
     }
     
 }

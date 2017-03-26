@@ -22,16 +22,12 @@ import javax.swing.JTextField;
  *
  * @author nathan
  */
-public class MainFrame extends JFrame implements ActionListener{
-    private JTextField tf;
-    private JTextArea ta;
-    private JScrollPane jp;
-    private JButton button;
-    private JLabel title;
-    private JLabel title2;
-    private GridBagConstraints gbc;
-    
+public class MainFrame extends JFrame implements ActionListener {
     private SendingMessage send;
+    private JTextArea _textArea;
+    private JTextField _textField;
+    private JScrollPane _scrollPane;
+    private GridBagConstraints _gridConstraints;
     
     private void initFrame() {
         this.setTitle("Client");
@@ -39,92 +35,57 @@ public class MainFrame extends JFrame implements ActionListener{
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLocationRelativeTo(null); 
     }
-    private void initGbc() {
-        gbc = new GridBagConstraints();
-        gbc.gridx = gbc.gridy = 0; 
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        gbc.gridheight = 1;
-        gbc.anchor = GridBagConstraints.LINE_START;
-        gbc.insets = new Insets(10, 15, 0, 0);
-        this.add(title, gbc);
+    private void setGridConstraints(int one,int two,double tree,double four, int five, int six, int seven, int eight,Insets in) {
+        if (one != -1) _gridConstraints.gridx = one;
+        if (two != -1) _gridConstraints.gridy = two;
+        if (tree != -1) _gridConstraints.weightx = tree;
+        if (four != -1) _gridConstraints.weighty = four;
+        if (five != -1) _gridConstraints.gridwidth = five;
+        if (six != -1) _gridConstraints.gridheight = six;
+        if (seven != -1) _gridConstraints.fill = seven;
+        if (eight != -1) _gridConstraints.anchor = eight;
+        if (in != null) _gridConstraints.insets = in;
     }
-    private void addScrollPane() {
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        gbc.gridheight = 1;
-        gbc.weightx = 1.;
-        gbc.weighty = 1.;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.anchor = GridBagConstraints.LINE_START;
-        gbc.insets = new Insets(10, 15, 0, 10);
-        this.add(jp, gbc);
-    }
-    private void addLabel() {
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.weightx = 0.;
-        gbc.weighty = 0.;
-        gbc.anchor = GridBagConstraints.LINE_START;
-        gbc.insets = new Insets(10, 15, 0, 0);
-        this.add(title2, gbc);
-    }
-    private void addTextField() {
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.gridwidth = 3;
-        gbc.weightx = 1.;
-        gbc.weighty = 0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.anchor = GridBagConstraints.LINE_START;
-        gbc.insets = new Insets(10, 15, 5, 0);
-        this.add(tf, gbc);
-    }
-    private void addButton() {
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.gridx = 4;
-        gbc.gridy = 3;
-        gbc.weightx = 0.;
-        gbc.anchor = GridBagConstraints.BASELINE;
-        gbc.insets = new Insets(10, 3, 5, 10);
-        button.addActionListener(this);
-        this.add(button, gbc);
+    private void addElements() {
+        setGridConstraints(0, 0, -1, -1, GridBagConstraints.REMAINDER, 1, -1, GridBagConstraints.LINE_START, new Insets(10, 15, 0, 0));
+        this.add(new JLabel("Messages : "), _gridConstraints);
+        setGridConstraints(0, 1, 1., 1., GridBagConstraints.REMAINDER, 1, GridBagConstraints.BOTH, GridBagConstraints.LINE_START, new Insets(10, 15, 0, 10));
+        this.add(_scrollPane,_gridConstraints);
+        setGridConstraints(0, 2, 0., 0., -1, -1, GridBagConstraints.NONE, GridBagConstraints.LINE_START, new Insets(10, 15, 0, 0));
+        this.add(new JLabel("Votre message : "),_gridConstraints);
+        setGridConstraints(0, 3, 1., 0, 3, -1, GridBagConstraints.HORIZONTAL, GridBagConstraints.LINE_START, new Insets(10, 15, 5, 10));
+        this.add(_textField, _gridConstraints);
+        setGridConstraints(3, 4, 0., -1, -1, -1, GridBagConstraints.NONE, GridBagConstraints.BASELINE, new Insets(10, 3, 5, 10));
+        JButton sendButton = new JButton("Envoi");
+        sendButton.addActionListener(this);
+        this.add(sendButton, _gridConstraints);
     }
     private void initLayout() {
         this.setLayout(new GridBagLayout());
-        
-        tf = new JTextField(" ");
-        ta = new JTextArea();
-        ta.setLineWrap(true);
-        ta.setWrapStyleWord(true);
-        jp = new JScrollPane(ta);
-        jp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        button = new JButton("Envoi");
-        title  = new JLabel("Messages : ");
-        title2 = new JLabel("Votre message : ");
-        
-        initGbc();
-        addScrollPane();
-        addLabel();
-        addTextField();
-        addButton();
+        _textField = new JTextField(" ");
+        _textArea = new JTextArea();
+        _textArea.setLineWrap(true);
+        _textArea.setWrapStyleWord(true);
+        _scrollPane = new JScrollPane(_textArea);
+        _scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        addElements();
     }
     
     @Override
     public void actionPerformed(ActionEvent e) {
-        send.createMessage(tf.getText());
-        updateScrollPane("Vous : \n"+tf.getText());
-        tf.setText(" ");
+        send.createMessage(_textField.getText());
+        updateScrollPane("Vous : \n"+_textField.getText());
+        _textField.setText(" ");
     }
     
     public void updateScrollPane(String message) {
-        ta.append(message);
-        ta.append("\n\n");
+        _textArea.append(message);
+        _textArea.append("\n\n");
     }
     
     public MainFrame(SendingMessage sm){
         send = sm;
+        _gridConstraints = new GridBagConstraints();
         initFrame();
         initLayout();               
         this.setVisible(true);

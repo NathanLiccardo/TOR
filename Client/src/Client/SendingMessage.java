@@ -17,6 +17,7 @@ public class SendingMessage{
         _create.setNodes(_circuit.getCircuit());
         _create.creation(msg,_circuit.getSecrets());
         _circuit.getConnection().sendMessage(_create.getMessage());
+        System.out.println("Message envoyé !");
     }
     public SendingMessage(Node client,ArrayList<Node> nodes) {
         _create = new CreateMessage(client);
