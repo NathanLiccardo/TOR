@@ -1,0 +1,52 @@
+\begin{thebibliography}{1}
+
+\bibitem{ref1}
+The~Tor Project.
+\newblock Overview, Avril 2017.
+\newblock \url{https://www.torproject.org/about/overview.html.en}.
+
+\bibitem{ref2}
+The~Tor Project.
+\newblock People, Avril 2017.
+\newblock \url{https://www.torproject.org/about/corepeople.html.en}.
+
+\bibitem{ref4}
+Roger Digledine.
+\newblock First onion proxy, Septembre 2002.
+\newblock \url{http://archives.seul.org/or/dev/Sep-2002/msg00019.html}.
+
+\bibitem{ref3}
+Wikipedia.
+\newblock Tor, Avril 2017.
+\newblock \url{https://en.wikipedia.org/wiki/Tor_(anonymity_network)}.
+
+\bibitem{ref5}
+Pierre Rouchon.
+\newblock Cryptographie et theorie des nombres, Octobre 2009.
+\newblock \url{http://cas.ensmp.fr/~rouchon/MinesCrypto/CryptoPR09.pdf}.
+
+\bibitem{ref8}
+J~Nechvatal, E~Barker, L~Bassham, W~Burr, M~Dworkin, J~Foti, and E~Roback.
+\newblock Report on the development of the advanced encryption standard (aes),
+  Octobre 2000.
+\newblock \url{http://csrc.nist.gov/archive/aes/round2/r2report.pdf}.
+
+\bibitem{ref6}
+Christophe Grenier.
+\newblock Techniques de cryptanalyst de rsa, Janvier 2009.
+\newblock
+  \url{ftp://ftp.irisa.fr/local/caps/DEPOTS/BIBLIO2009/Grenier_Christophe.pdf}.
+
+\bibitem{ref7}
+A.Shamir R.L.Rivest and L.Adleman.
+\newblock A method for obtaining digital signatures and public-key
+  cryptosystems, Fevrier 1978.
+\newblock \url{https://people.csail.mit.edu/rivest/Rsapaper.pdf}.
+
+\bibitem{ref9}
+Houda FERRADI.
+\newblock Introduction a la cryptographie (cours 3): Chiffrement par bloc
+  (des), Fevrier 2016.
+\newblock \url{http://www.di.ens.fr/~ferradi/coursDES.pdf}.
+
+\end{thebibliography}

@@ -6,6 +6,8 @@
 \usepackage{tikz}
 \usetikzlibrary{tikzmark,arrows.meta}
 \usepackage{amsmath}
+\usepackage{amssymb}
+
 
 
 \title{Mini-Tor : Le réseau Tor démystifié}
@@ -30,15 +32,89 @@ Comme dit précédemment, Tor a pour objectif d'améliorer la vie privée et la libe
 Dans la prochaine section, nous aborderons donc les techniques de chiffrage des données afin de pouvoir les faire transiter au sein du réseau de manière sécurisée. Suivra ensuite une seconde section permettant d'expliciter le fonctionnement du réseau Tor ainsi que l'utilisation du chiffrage des données au sein de ce dernier.
 
 \section{Chiffrement}
-La question de la sécurisation des données au sein du réseau Tor est un élément important si l'on souhaite comprendre correctement ce dernier. Il existe, à l'heure actuelle, deux techniques permettant de chiffrer des données à savoir : le chiffrement asymétrique et symétrique. Dans la suite de ce document, lorsque nous parlerons de sécurisation des données, cela reviendra à appliquer l'une de ces deux techniques de chiffrement sur un paquet de données. Dans cette section, je commencerai donc par détailler le principe du chiffrement asymétrique. Ce dernier sera également accompagné d'une application concrète (RSA \cite{ref5}). J'évoquerai donc dans un second temps le chiffrement symétrique en accompagnant également ce dernier d'une application concrète (Diffle-Hellman \cite{ref5}). Dans le cas des deux techniques de sécurisation, il est important de comprendre que l'on applique une transformation sur les données. Les techniques de chiffrement prennent donc une valeur en entrée et ressortent une valeur complètement différente en sortie. Les algorithmes mathématiques appliqués sur les données afin d'obtenir une valeur de sortie différente se basent sur l'utilisation de clés de chiffrement. Ce sont ces dernières (clés) qui varient en fonction du type de chiffrement appliqué (asymétrique ou symétrique).
+La question de la sécurisation des données au sein du réseau Tor est un élément important si l'on souhaite comprendre correctement ce dernier. Il existe, à l'heure actuelle, deux techniques permettant de chiffrer des données à savoir : le chiffrement asymétrique et symétrique. Dans la suite de ce document, lorsque nous parlerons de sécurisation des données, cela reviendra à appliquer l'une de ces deux techniques de chiffrement sur un paquet de données. Dans cette section, je commencerai donc par détailler le principe du chiffrement asymétrique. Ce dernier sera également accompagné d'une application concrète (RSA \cite{ref5}). J'évoquerai donc dans un second temps le chiffrement symétrique en accompagnant également ce dernier d'une application concrète (AES \cite{ref8}). Dans le cas des deux techniques de sécurisation, il est important de comprendre que l'on applique une transformation sur les données. Les fonctions de chiffrage prennent donc une valeur en entrée et ressortent une valeur complètement différente en sortie. Les algorithmes mathématiques appliqués sur les données afin d'obtenir une valeur de sortie différente se basent sur l'utilisation de clés de chiffrement. Ce sont ces dernières (clés) qui varient en fonction du type de chiffrement appliqué (asymétrique ou symétrique). Voici une illustration permettant de schématiser de manière simple le fonctionnement d'une fonction de chiffrement (que l'on utilise la technique symétrique ou asymétrique) : \\ 
+
+\begin{tikzpicture}
+\draw (-1.5,-0.25) node{Données} ;
+\draw (-1.5,-0.65) node{(non chiffrées)} ;
+\draw[->] (-0.4,-0.5) -- (0.15,-0.5);
+\pgfmathsetmacro{\cubex}{2}
+\pgfmathsetmacro{\cubey}{1}
+\pgfmathsetmacro{\cubez}{1}
+\draw[black] (2.2,0,0) -- ++(-\cubex,0,0) -- ++(0,-\cubey,0) -- ++(\cubex,0,0) -- cycle;
+\draw[black] (2.2,0,0) -- ++(0,0,-\cubez) -- ++(0,-\cubey,0) -- ++(0,0,\cubez) -- cycle;
+\draw[black] (2.2,0,0) -- ++(-\cubex,0,0) -- ++(0,0,-\cubez) -- ++(\cubex,0,0) -- cycle;
+\draw (1.2,-0.47) node{Algorithme};
+\draw[->] (2.65,-0.5) -- (3.35,-0.5);
+\draw (4.1,-0.25) node{Données};
+\draw(4.1,-0.65) node{(chiffrées)};
+\end{tikzpicture} \\
+
+Les clés évoquées précédemment sont donc utilisées par l'algorithme afin de pouvoir modifier les données fournies en entrée de ce dernier. On parle donc bien de paramètre fourni par l'utilisateur de l'algorithme de chiffrement afin que ce dernier fournisse une sortie définie par la clé. Pour finir, nous utiliserons dans le cadre de ce rapport des clés composées de différents caractères. Il est à noter que ces dernières peuvent être de toute forme à partir du moment ou l'algorithme permettant de chiffrer les données est capable d'utiliser cette dernière (câblage électrique, chaine de caractères, chaine binaire, ...)
 
 \subsection{Asymétrique}
+Le chiffrement asymétrique est donc la première approche que nous aborderons. Ce dernier est défini par l'utilisation de deux clés de chiffrement et déchiffrement (action inverse du chiffrement) \footnote{Action de déchiffrer à savoir lire ou comprendre un texte écrit peu lisiblement ou codé.} différentes et se base sur les fonctions à sens unique. Soit $n \in \mathbb{N} $ on pose $ A_n = \{ 1,2,...,n \} $ et $B_n$ deux ensembles finis. La fonction : 
+\begin{center}
+$f_n : A_n \rightarrow B_n$
+\end{center}
+est définie comme à sens unique si : \vspace{0.03cm}
+\begin{itemize}
+\item Il est facile de calculer $f_n(x)$ pour un $n$ très grand ($x \in A_n$). $\rightarrow$ $f_n$ facile à calculer .
+\item Il est difficile pour $y \in f_n(A_n)$ de trouver un $x$ tel que $f(x) = y$. $\rightarrow$ $f_n$ difficile à inverser. \vspace{0.1cm}
+\end{itemize}
+Les algorithmes de chiffrement asymétriques sont donc directement inspirés de ce principe. Si l'on applique ce principe sur une phrase à chiffrer, il est aisé d'appliquer la transformation dans un sens mais extrêmement difficile de retrouver le message originel. Il existe cependant bien deux solutions permettant de retrouver le message : effectuer l'ensemble des solutions (généralement exponentiel) ou posséder une clé permettant le déchiffrage. On déduit donc effectivement les deux clés cités précédemment: \vspace{0.03cm}
+\begin{itemize}
+\item Publique : permet de chiffrer le message (facile)
+\item Privée : permet de déchiffrer le message (difficile) \vspace{0.1cm}
+\end{itemize}
+Comme dit précédemment, l'utilisation de ce type d'algorithme reste néanmoins extrêmement lent même si l'on possède la clé dite privée. Ils restent cependant très utilisé grâce à leurs propriétés distribuées. L'algorithme le plus connu des systèmes asymétriques est connu sous le nom de RSA \cite{ref6}. Il a été développé en 1978 par Ron Rivest, Adi Shamir et Leonard Adleman \cite{ref7}. Ce dernier porte donc comme nom les initiales des ses trois créateurs. Rsa se définit donc par l'utilisation de deux clés différentes pour le chiffrement et le déchiffrement des données. Les étapes nécessaires à la génération des clés sont les suivantes : \vspace{0.03cm}
+\begin{itemize}
+\item[$1. $] Générer deux nombres premier $p$ et $q$
+\item[$2. $] Calculer $N = p*q$ et $\varphi(N) = (p-1)*(q-1)$
+\item[$3. $] Choisir un entier $e$, $1<e<\varphi(N)$ t.q $pgcd(e,\varphi(N)) = 1)$
+\item[$4. $] Calculer $d$ t.q $e*d \equiv 1 \mod \varphi(N)$
+\item[$5. $] La clé publique : $(N,e)$ ; La clé privée : $(d)$ \vspace{0.1cm}
+\end{itemize}
+On peut donc à présent calculer les fonctions permettant d'obtenir un message chiffré mais également d'effectuer l'opération inverse (déchiffrage).
+La fonction de chiffrement $e_K$ publique est donc définie par :
+\begin{center}
+$e_K(m) := m^e \mod N$
+\end{center} 
+La fonction de déchiffrement quand à elle est définie par :
+\begin{center}
+$d_K(c) := c^d \mod N$
+\end{center}
+Il est à noter que les fonctions de chiffrement et déchiffrement sont commutatives. Dans le cas ou le message est chiffré à partir de la fonction $e_k(m)$ (resp. $d_K(c)$) il peut alors être déchiffré par $d_K(c)$ (resp. $e_K(m)$). \\
 
+\begin{tikzpicture}
+\draw (-3.15,-0.25) node{Données} ;
+\draw (-3.15,-0.65) node{(non chiffrées)} ;
+\pgfmathsetmacro{\cubex}{2.3}
+\pgfmathsetmacro{\cubey}{1}
+\pgfmathsetmacro{\cubez}{1}
+\draw[black] (-2,0,0) -- ++(-\cubex,0,0) -- ++(0,-\cubey,0) -- ++(\cubex,0,0) -- cycle;
+\draw[black] (-2,0,0) -- ++(0,0,-\cubez) -- ++(0,-\cubey,0) -- ++(0,0,\cubez) -- cycle;
+\draw[black] (-2,0,0) -- ++(-\cubex,0,0) -- ++(0,0,-\cubez) -- ++(\cubex,0,0) -- cycle;
+\draw (-0.25,-0.47) node{RSA};
+\draw (2.2,-0.25) node{Données};
+\draw (2.2,-0.65) node{(chiffrées)};
+pgfmathsetmacro{\cubex}{2}
+\pgfmathsetmacro{\cubey}{1}
+\pgfmathsetmacro{\cubez}{1}
+\draw[black] (3.3,0,0) -- ++(-\cubex,0,0) -- ++(0,-\cubey,0) -- ++(\cubex,0,0) -- cycle;
+\draw[black] (3.3,0,0) -- ++(0,0,-\cubez) -- ++(0,-\cubey,0) -- ++(0,0,\cubez) -- cycle;
+\draw[black] (3.3,0,0) -- ++(-\cubex,0,0) -- ++(0,0,-\cubez) -- ++(\cubex,0,0) -- cycle;
+\draw[red, thick,rounded corners=8pt,->] (-2,0)--(-0.5,0.5) node[yshift=0.2cm]{$e_K(m)$} --(1,0);
+\draw[red, thick,rounded corners=8pt,<-] (-2,-1)--(-0.5,-1.5) node[yshift=-0.2cm]{$d_K(c)$} --(1,-1);
+\end{tikzpicture}
+RSA est fondé sur l'utilisation de grands nombre ainsi que la difficulté de factoriser ces derniers \cite{ref6}. Il n'existe cependant à l'heure actuelle aucune preuve mathématique permettant de prouver l'équivalence entre le problème de factorisation et le déchiffrement aisé. On se base donc principalement sur des intuitions mathématiques. L'utilisation de grands nombres signifie utiliser des clés d'au moins 1024 bits. 
 
+\subsection{Symétrique}
+Il sera maintenant question du second type de chiffrement à savoir Symétrique. Ce dernier se base sur un principe complètement différent du chiffrement asymétrique. En effet, la clé de chiffrement et déchiffrement utilisée dans ce cas-ci est unique et identique. Le chiffrement symétrique se divise également en deux grandes catégories à savoir le chiffrement par bloc (que nous verrons par la suite) et le chiffrement par flot (que nous n'aborderons pas ici) \cite{ref9}. Avant d'entamer les notions de chiffrement par bloc, il est important de souligner la différence majeure entre les fonctions de chiffrement symétriques et asymétriques. Il a été dit précédemment que le fonctionnement de ces dernières était extrêmement lent. Cela n'est pas le cas pour les systèmes symétriques qui s'appuient sur des fonctions inversibles et efficaces \cite{ref9}.
 
 \section{Architecture}
 \subsection{Introduction}
-Comme dit précédemment, chaque message parcourant le réseau Tor est encapsulé dans une structure sous forme d'oignon. Le message encapsulé passe également par une série de proxy avant d'atteindre le destinataire. Afin de comprendre un tel mécanisme, il est intéressant de se pencher sur le fonctionnement des différents éléments constituant le réseau. En premier lieu, nous aborderons donc les clients (qui se connectent au réseau), nous détaillerons ensuite les noeuds du système (qui permettent de \og noyer \fg{} le message) et pour finir nous expliquerons la façon dont les noeuds sont distribués via les serveurs Tor. Nous émettrons l'hypothèse, pour cette section, que les messages échangés sont sécurisés. L'aspect cryptographique de Tor fera, en effet, l'objet d'une section dédiée dans la suite de ce travail afin de pouvoir approfondir certains aspects importants du réseau.
+Comme dit précédemment, chaque message parcourant le réseau Tor est encapsulé dans une structure sous forme d'oignon. Le message encapsulé passe également par une série de proxy avant d'atteindre le destinataire. Afin de comprendre un tel mécanisme, il est intéressant de se pencher sur le fonctionnement des différents éléments constituant le réseau. En premier lieu, nous aborderons donc les clients (qui se connectent au réseau), nous détaillerons ensuite les noeuds du système (qui permettent de \og noyer \fg{} le message) et pour finir nous expliquerons la façon dont les noeuds sont distribués via les serveurs Tor. Nous émettrons l'hypothèse, pour cette section, que les messages échangés sont sécurisés. L'aspect cryptographique de Tor fera, en effet, l'objet d'une section dédiée dans la suite de ce travail afin de pouvoir approfondir certains aspects importants du réseau. 
 
 \subsection{Client}
 Il est intéressant, dans un premier temps, d'aborder la notion de clients. Ce sont eux qui se connectent au réseau afin d'effectuer des requêtes auprès de serveurs web ou d'échanger des messages de manière anonyme. L'implication des clients reste minimale. En effet, ils se connectent au réseau mais n'effectuent aucune modification sur ce dernier. Il est important de signaler également que ce sont eux qui doivent être protégés. C'est donc pour les clients que le projet Tor a été créé et c'est pour cette raison que l'association Tor Project a mis en place plusieurs outils permettant une simplification d'utilisation. Cependant, il faut noter que les clients peuvent également configurer eux-même les outils Tor. Pour cette raison, le réseau ne bloque pas l'accès via une application unique mais permet bel et bien l'utilisation à toutes les personnes ayant configuré leur système afin d'accéder au réseau. Lorsqu'un client utilise le réseau, il a un certain nombre de tâches à effectuer. Dans un premier temps, il est utile de sélectionner un chemin à parcourir avant d'arriver à la destination. Dans mon implémentation personnelle, ce chemin est constitué de trois noeuds ce qui reflète bien le schéma réel. Une fois le chemin obtenu, le client peut donc transmettre des message au sein du réseau. Pour ce faire, il lui est utile de formater ces messages sous la forme d'un oignon (utilisation de l'oignon routing). Une fois le message empaqueté, il peut être distribué sur le réseau. A partir de ce moment, la mission du client est terminée et le réseau Tor s'occupe du reste. Pour conclure la partie concernant le client, voici donc les 4 étapes majeures de ce dernier : 

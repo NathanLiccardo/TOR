@@ -1,0 +1,48 @@
+This is BibTeX, Version 0.99d (TeX Live 2016)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: Rapport.aux
+The style file: unsrt.bst
+Database file #1: /Users/nathan/Documents/BA3/INFOF308/TOR/Rapport/references.bib.bib
+Warning--I didn't find a database entry for "ref10"
+You've used 9 entries,
+            1791 wiz_defined-function locations,
+            492 strings with 4716 characters,
+and the built_in function-call counts, 1282 in all, are:
+= -- 92
+> -- 59
+< -- 0
++ -- 25
+- -- 16
+* -- 44
+:= -- 201
+add.period$ -- 27
+call.type$ -- 9
+change.case$ -- 9
+chr.to.int$ -- 0
+cite$ -- 9
+duplicate$ -- 45
+empty$ -- 163
+format.name$ -- 16
+if$ -- 289
+int.to.chr$ -- 0
+int.to.str$ -- 9
+missing$ -- 0
+newline$ -- 48
+num.names$ -- 9
+pop$ -- 63
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 28
+stack$ -- 0
+substring$ -- 0
+swap$ -- 9
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 0
+while$ -- 9
+width$ -- 10
+write$ -- 92
+(There was 1 warning)
