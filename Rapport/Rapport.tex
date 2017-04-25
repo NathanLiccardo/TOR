@@ -9,7 +9,6 @@
 \usepackage{amssymb}
 
 
-
 \title{Mini-Tor : Le réseau Tor démystifié}
 \author {Nathan Liccardo \\ \mbox{} \\ nathan.liccardo@ulb.ac.be}
 
@@ -110,7 +109,29 @@ pgfmathsetmacro{\cubex}{2}
 RSA est fondé sur l'utilisation de grands nombre ainsi que la difficulté de factoriser ces derniers \cite{ref6}. Il n'existe cependant à l'heure actuelle aucune preuve mathématique permettant de prouver l'équivalence entre le problème de factorisation et le déchiffrement aisé. On se base donc principalement sur des intuitions mathématiques. L'utilisation de grands nombres signifie utiliser des clés d'au moins 1024 bits. 
 
 \subsection{Symétrique}
-Il sera maintenant question du second type de chiffrement à savoir Symétrique. Ce dernier se base sur un principe complètement différent du chiffrement asymétrique. En effet, la clé de chiffrement et déchiffrement utilisée dans ce cas-ci est unique et identique. Le chiffrement symétrique se divise également en deux grandes catégories à savoir le chiffrement par bloc (que nous verrons par la suite) et le chiffrement par flot (que nous n'aborderons pas ici) \cite{ref9}. Avant d'entamer les notions de chiffrement par bloc, il est important de souligner la différence majeure entre les fonctions de chiffrement symétriques et asymétriques. Il a été dit précédemment que le fonctionnement de ces dernières était extrêmement lent. Cela n'est pas le cas pour les systèmes symétriques qui s'appuient sur des fonctions inversibles et efficaces \cite{ref9}.
+Il sera maintenant question du second type de chiffrement à savoir symétrique. Ce dernier se base sur un principe complètement différent du chiffrement asymétrique. En effet, la clé de chiffrement et déchiffrement utilisée dans ce cas-ci est unique et identique. Le chiffrement symétrique se divise également en deux grandes catégories à savoir le chiffrement par bloc (que nous verrons par la suite) et le chiffrement par flot (que nous n'aborderons pas ici) \cite{ref9}. Avant d'entamer les notions de chiffrement par bloc, il est important de souligner la différence majeure entre les fonctions de chiffrement symétriques et asymétriques. Il a été dit précédemment que le fonctionnement de ces dernières était extrêmement lent. Cela n'est pas le cas pour les systèmes symétriques qui s'appuient sur des fonctions inversibles et efficaces \cite{ref9}. Un algorithme de chiffrement symétrique se définit donc comme la transformation d'un message M avec une clé secrète K. Le résultat est donc un message chiffré C.  \\
+
+\begin{tikzpicture}
+\draw (-3.5,-0.5) node{$M = \{ 0,1 \}^n$} ;
+\draw[->] (-2.5,-0.5)--(-1.6,-0.5);
+\pgfmathsetmacro{\cubex}{2.3}
+\pgfmathsetmacro{\cubey}{1}
+\pgfmathsetmacro{\cubez}{0}
+\draw[black] (0.8,0,0) -- ++(-\cubex,0,0) -- ++(0,-\cubey,0) -- ++(\cubex,0,0) -- cycle;
+\draw[black] (0.8,0,0) -- ++(0,0,-\cubez) -- ++(0,-\cubey,0) -- ++(0,0,\cubez) -- cycle;
+\draw[black] (0.8,0,0) -- ++(-\cubex,0,0) -- ++(0,0,-\cubez) -- ++(\cubex,0,0) -- cycle;
+\draw (-0.33,-0.5) node{Chiffrement};
+\draw[->] (0.9,-0.5)--(1.55,-0.5);
+\draw[->] (-0.25,-1.7)--(-0.25,-1.1);
+\draw (2.5,-0.5) node{$C = \{ 0,1 \}^n$};
+\draw (-0.35,-2) node{$K = \{ 0,1 \}^k$};
+\end{tikzpicture}
+Comme dit précédemment, les algorithmes à chiffrement symétrique fonctionnent généralement par blocs. On voit alors que le message est traités par morceaux de données de tailles équivalentes \footnote{On découpe le message en blocs de tailles équivalents}. On effectue donc un premier traitement durant lequel on découpe le message afin d'obtenir une succession de blocs pouvant être traités par la suite par l'algorithme. Comme dit dans \cite{ref10}, il existe deux principes fondamentaux qui sont utilisés dans le chiffrement symétrique par blocs. Le premier étant la confusion \footnote{Masquer toute relation linéaire entre le chiffré et le message en clair} et le second la diffusion \footnote{Cacher la redondance en répartissant l?influence d?un bit de clé sur tout le chiffré}. Ces deux notions seront donc à la base des algorithmes de chiffrement et seront appliqués sur les blocs cités précédemment. Il faut également prendre en compte un dernier point à savoir l'inversibilité de la fonction de chiffrement symétrique. Etant donné que la méthode prend comme principale propriété le fait de pouvoir retomber sur le message à partir de la clé de chiffrement, on dit que les fonctions de chiffrement symétrique sont bijectives. Afin d'illustrer au mieux le fonctionnement d'un chiffrement symétrique, nous utiliserons dans ce rapport le système AES (Advanced Encryption Security) qui a été développé dans les années 2000 \cite{ref10}. Concrètement, AES est basé sur un algorithme itératif. En fonction de la taille de la clé (128 ou 256 bits), l'algorithme verra son nombre de tours modifié (resp. 10 ou 14 tours). A chaque tour, on a donc dans un premier temps une confusion qui est assurée par une substitution non-linéaire suivie d'une diffusion quand à elle assurée par permutation linéaire. Voici donc le détail des différentes étapes nécessaires. 
+\subsubsection{Etape 1.}On commence donc par placer l'ensemble des données (sous forme d'octets) dans une matrice 4*4 (128 bits au total). Cette étape constitue donc une étape préliminaire qui ne sera pas effectuée lors des différentes itération. On a donc l'ensemble des données représentées sous la forme suivante : 
+
+\subsubsection{Etape 2.} 
+
+
 
 \section{Architecture}
 \subsection{Introduction}

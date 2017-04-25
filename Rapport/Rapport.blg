@@ -3,46 +3,44 @@ Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: Rapport.aux
 The style file: unsrt.bst
 Database file #1: /Users/nathan/Documents/BA3/INFOF308/TOR/Rapport/references.bib.bib
-Warning--I didn't find a database entry for "ref10"
-You've used 9 entries,
+You've used 10 entries,
             1791 wiz_defined-function locations,
-            492 strings with 4716 characters,
-and the built_in function-call counts, 1282 in all, are:
-= -- 92
-> -- 59
+            494 strings with 4833 characters,
+and the built_in function-call counts, 1413 in all, are:
+= -- 102
+> -- 63
 < -- 0
-+ -- 25
-- -- 16
-* -- 44
-:= -- 201
-add.period$ -- 27
-call.type$ -- 9
-change.case$ -- 9
++ -- 27
+- -- 17
+* -- 47
+:= -- 222
+add.period$ -- 30
+call.type$ -- 10
+change.case$ -- 10
 chr.to.int$ -- 0
-cite$ -- 9
-duplicate$ -- 45
-empty$ -- 163
-format.name$ -- 16
-if$ -- 289
+cite$ -- 10
+duplicate$ -- 50
+empty$ -- 181
+format.name$ -- 17
+if$ -- 319
 int.to.chr$ -- 0
-int.to.str$ -- 9
+int.to.str$ -- 10
 missing$ -- 0
-newline$ -- 48
-num.names$ -- 9
-pop$ -- 63
+newline$ -- 53
+num.names$ -- 10
+pop$ -- 70
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 28
+skip$ -- 30
 stack$ -- 0
 substring$ -- 0
-swap$ -- 9
+swap$ -- 10
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 0
 warning$ -- 0
-while$ -- 9
-width$ -- 10
-write$ -- 92
-(There was 1 warning)
+while$ -- 10
+width$ -- 12
+write$ -- 102
