@@ -6,15 +6,14 @@
 package Model;
 
 import Controller.CryptographyController;
-import Utils.SerializationUtils;
 import Utils.SendUtils;
+import Utils.SerializationUtils;
 import java.io.IOException;
 import java.net.Socket;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Random;
 import javax.crypto.KeyGenerator;
+import javax.crypto.SealedObject;
 import javax.crypto.SecretKey;
 
 /**
@@ -34,20 +33,9 @@ public class CircuitModel {
     private static final int SIZE = 3;
     
     private void chooseNodes(){
-        Random rand = new Random();
         circuit = new ArrayList<>();
-        int[] values = new int[SIZE];
-        
-        for (int i=0;i<SIZE;i++) 
-            values[i] = rand.nextInt(nodes.size());
-        while (values[0] == values[1]) 
-            values[1] = rand.nextInt(nodes.size());
-        while (values[2] == values[0] || values[1] == values[2])
-            values[2] = rand.nextInt(nodes.size());
-        
-        for (int i=0;i<SIZE;i++) circuit.add(nodes.get(values[i]));
+        for (int i=0;i<SIZE;i++) circuit.add(nodes.get(i));
     }
-    
     private void createKey() {
         keys = new ArrayList<>();
         try {
@@ -62,20 +50,21 @@ public class CircuitModel {
         }
     }
     
-    // -> ERROR MESSAGE
     private void createMessageSecretKeys() {
         byte[] byteMessage = null;
+        
         keys.add(SIZE, null); nodes.add(0, null);
         message = new MessageModel(byteMessage, SerializationUtils.serialize((keys.get(0))), nodes.get(0), 0);
-        String encodedKey = Base64.getEncoder().encodeToString(keys.get(0).getEncoded());
-        System.out.println("Key : "+encodedKey+" ("+0+")");
-        for (int i=1; i<SIZE+1; i++){
-            crypt.setValues(message, nodes.get(i));
-            message = new MessageModel(crypt.crypt(false), SerializationUtils.serialize(keys.get(i)), nodes.get(i), i);
-            encodedKey = null;
-            if (i != SIZE) encodedKey = Base64.getEncoder().encodeToString(keys.get(i).getEncoded());
-            if (i != SIZE) System.out.println("Key : "+encodedKey+" ("+i+")");
-        }
+        // 1
+        crypt.setValues(message, nodes.get(1));
+        message = new MessageModel(crypt.crypt(false), SerializationUtils.serialize(keys.get(1)), nodes.get(1), 1);
+        // 2
+        crypt.setValues(message, nodes.get(2));
+        message = new MessageModel(crypt.crypt(false), SerializationUtils.serialize(keys.get(2)), nodes.get(2), 2);
+        // 3
+        crypt.setValues(message, nodes.get(3));
+        message = new MessageModel(crypt.crypt(false), SerializationUtils.serialize(keys.get(3)), nodes.get(3), 3);
+        
         keys.remove(SIZE); nodes.remove(0);
     }
     
@@ -97,6 +86,9 @@ public class CircuitModel {
     }
     
     private void sendKeys() {
+        System.out.println(message.getNum());
+        System.out.println(message.getNode().getIp());
+        System.out.println(message.getNode().getPort());
         initSocket(message.getNode());
         sendMessage.sendObject(message);
     }
@@ -106,6 +98,7 @@ public class CircuitModel {
         createKey();
         createMessageSecretKeys();
         sendKeys();
+        System.out.println("OK creation");
     }
     
     public void check() {
@@ -131,7 +124,8 @@ public class CircuitModel {
     public CircuitModel(ArrayList<NodeModel> n) {
         System.out.println(n);
         nodes = n;
-        message = new MessageModel(null,null,null,0);
+        SealedObject obj = null;
+        message = new MessageModel(obj,null,null,0);
         crypt = new CryptographyController();
     }
     

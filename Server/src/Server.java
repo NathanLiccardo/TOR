@@ -1,19 +1,19 @@
+
+import Controller.NodeController;
+import Model.NodeModel;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
-
-
-import Controller.NodeController;
-import Controller.SSLController;
-import Model.NodeModel;
-import java.io.IOException;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import javax.net.ssl.SSLServerSocket;
-import javax.net.ssl.SSLSocket;
 
 /**
  *
@@ -22,10 +22,9 @@ import javax.net.ssl.SSLSocket;
 public class Server implements Runnable{
     private final int _port;
     private final String _host ;
-    //private ServerSocket _server;
+    private ServerSocket _server;
     public ArrayList<NodeModel> _node;
     
-    /*
     public void initServer() {
         try {
             _server = new ServerSocket(_port, 100,InetAddress.getByName(_host));
@@ -46,8 +45,8 @@ public class Server implements Runnable{
                 System.err.println(ex);
             }
         }
-    }*/
-    
+    }
+    /*
     private SSLServerSocket initServer() throws UnknownHostException,IOException {
         SSLController sslConnection = new SSLController(_port, 100, _host);
         sslConnection.connect();
@@ -65,7 +64,7 @@ public class Server implements Runnable{
         } catch (IOException ex) {
             System.err.println(ex);
         }
-    }
+    }*/
     
     public Server(){
         _host = "localhost";
@@ -80,7 +79,7 @@ public class Server implements Runnable{
     }
     
     public static void main(String args[]) throws Exception{
-        new Thread(new Server(args[0],Integer.getInteger(args[1]))).start();
+        new Thread(new Server()).start();
     }
     
 }

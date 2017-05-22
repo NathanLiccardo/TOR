@@ -1,17 +1,15 @@
 \BOOKMARK [1][-]{section*.1}{Introduction}{}% 1
 \BOOKMARK [1][-]{section*.2}{Chiffrement}{}% 2
 \BOOKMARK [2][-]{section*.3}{Asym\351trique}{section*.2}% 3
-\BOOKMARK [2][-]{section*.4}{Sym\351trique}{section*.2}% 4
-\BOOKMARK [1][-]{section*.7}{Architecture}{}% 5
-\BOOKMARK [2][-]{section*.8}{Introduction}{section*.7}% 6
-\BOOKMARK [2][-]{section*.9}{Client}{section*.7}% 7
-\BOOKMARK [2][-]{section*.10}{Noeuds}{section*.7}% 8
-\BOOKMARK [2][-]{section*.11}{Serveurs}{section*.7}% 9
-\BOOKMARK [1][-]{section*.12}{Fonctionnement}{}% 10
-\BOOKMARK [2][-]{section*.13}{Introduction}{section*.12}% 11
-\BOOKMARK [2][-]{section*.14}{Circuits}{section*.12}% 12
-\BOOKMARK [2][-]{section*.15}{Messages}{section*.12}% 13
-\BOOKMARK [2][-]{section*.16}{Echanges de cl\351s}{section*.12}% 14
-\BOOKMARK [1][-]{section*.19}{Impl\351mentation}{}% 15
-\BOOKMARK [1][-]{section*.20}{Aspect social}{}% 16
-\BOOKMARK [1][-]{section*.21}{Conclusion}{}% 17
+\BOOKMARK [2][-]{section*.6}{Sym\351trique}{section*.2}% 4
+\BOOKMARK [2][-]{section*.10}{Echange de cl\351s}{section*.2}% 5
+\BOOKMARK [1][-]{section*.11}{Probl\350me d'anonymat}{}% 6
+\BOOKMARK [2][-]{section*.12}{Routage en oignon}{section*.11}% 7
+\BOOKMARK [1][-]{section*.14}{Le r\351seau Tor}{}% 8
+\BOOKMARK [2][-]{section*.15}{Clients}{section*.14}% 9
+\BOOKMARK [2][-]{section*.18}{Noeuds}{section*.14}% 10
+\BOOKMARK [2][-]{section*.21}{Directory Authorities}{section*.14}% 11
+\BOOKMARK [2][-]{section*.22}{Attaques}{section*.14}% 12
+\BOOKMARK [1][-]{section*.26}{Impl\351mentation}{}% 13
+\BOOKMARK [1][-]{section*.27}{Aspects sociaux}{}% 14
+\BOOKMARK [1][-]{section*.28}{Conclusion}{}% 15

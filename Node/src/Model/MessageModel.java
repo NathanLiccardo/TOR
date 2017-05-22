@@ -5,8 +5,8 @@
  */
 package Model;
 
-import Model.NodeModel;
 import java.io.Serializable;
+import javax.crypto.SealedObject;
 
 /**
  *
@@ -17,6 +17,7 @@ public class MessageModel implements Serializable{
     private NodeModel _next;
     private byte[] _key;
     private byte[] _message;
+    private SealedObject _messageS;
     
     public MessageModel(byte[] m, byte[] k, NodeModel n, int num) {
         _key = k;
@@ -25,8 +26,18 @@ public class MessageModel implements Serializable{
         _message = m;
     }
     
+    public MessageModel(SealedObject m, byte[] k, NodeModel n, int num) {
+        _key = k;
+        _next = n;
+        _val = num;
+        _messageS = m;
+    }
+    
     public byte[] getMessage() {
         return _message;
+    }
+    public SealedObject getMessageS() {
+        return _messageS;
     }
     public NodeModel getNode() {
         return _next;
@@ -40,6 +51,9 @@ public class MessageModel implements Serializable{
     
     public void setMessage(byte[] m) {
         _message = m;
+    }
+    public void setMessage(SealedObject m) {
+        _messageS = m;
     }
     public void setNode(NodeModel n) {
         _next = n;

@@ -5,8 +5,9 @@ import Model.MessageModel;
 import Utils.SerializationUtils;
 import Model.NodeModel;
 import java.security.InvalidKeyException;
-import java.security.Key;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.util.Base64;
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
@@ -16,20 +17,27 @@ import javax.crypto.SecretKey;
  * @author Nathan
  */
 public class CryptographyController {
-    private Key _key;
+    private PublicKey _key;
     private NodeModel _node;
     private byte[] _message;
     private SecretKey _secretKey;
     
-    private final int SIZE1 = 53;
+    private final int SIZE1 = 100;
     private final int SIZE2 = 128;
     
     private Cipher initCipher (String text, boolean symetric) {
         Cipher cipher = null;
         try{
             cipher = Cipher.getInstance(text);
-            if (symetric) cipher.init(Cipher.ENCRYPT_MODE, _secretKey);
-            else cipher.init(Cipher.ENCRYPT_MODE, _key);
+            if (symetric) { 
+                cipher.init(Cipher.ENCRYPT_MODE, _secretKey);
+            }
+            else {
+                cipher.init(Cipher.ENCRYPT_MODE, _key);
+                String encodedKey = Base64.getEncoder().encodeToString(_key.getEncoded());
+                System.out.println("Key : "+encodedKey+" ("+0+")");
+            }
+            System.out.println("OK");
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException ex) {
             System.err.println(ex);
         }

@@ -37,6 +37,8 @@ public class CryptedModel {
     }
     
     public void copyOfRange(byte[] a, int start, int end) {
+        System.out.println(start);
+        System.out.println(end);
         array = Arrays.copyOfRange(a, start, end);
     }
     

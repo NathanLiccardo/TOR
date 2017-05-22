@@ -1,15 +1,21 @@
 \documentclass[letterpaper]{article}
 \usepackage{natbib,alifexi}
-\usepackage[latin1]{inputenc}
+\usepackage[utf8]{inputenc}
 \usepackage[francais]{babel}
 \usepackage{hyperref}
 \usepackage{tikz}
 \usetikzlibrary{tikzmark,arrows.meta}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{graphicx}
 
 
-\title{Mini-Tor : Le réseau Tor démystifié}
+\addto\captionsfrench{%
+  \renewcommand{\tablename}{Fig.}%
+}
+
+
+\title{Mini-Tor : Le rÃ©seau Tor dÃ©mystifiÃ©}
 \author {Nathan Liccardo \\ \mbox{} \\ nathan.liccardo@ulb.ac.be}
 
 
@@ -17,25 +23,25 @@
 \maketitle
 
 \begin{abstract}
-Dans le cadre de mon mémoire de fin de bachelier, j'ai décidé d'aborder le réseau d'anonymisation de connexions et communications Tor. Afin de réaliser mon travail, il m'a été demandé, dans un premier temps, de comprendre l'architecture de ce système afin de pouvoir, dans un second temps, implémenter le système de façon schématique et moins complexe que le réseau Tor réel. On retrouvera donc dans l'ensemble de ce document à la fois la partie théorique de mon travail reprenant les concepts sur lesquels repose le réseau mais également les détails de mon implémentation permettant de retrouver et d'illustrer ces concepts. Je tiens à remercier Monsieur François Gérard pour son aide précieuse lors de la rédaction et l'implémentation de ce travail.
+Dans le cadre de mon mÃ©moire de fin de bachelier, j'ai dÃ©cidÃ© d'aborder le rÃ©seau d'anonymisation de connexions et communications Tor. Afin de rÃ©aliser mon travail, il m'a Ã©tÃ© demandÃ©, dans un premier temps, de comprendre l'architecture de ce systÃ¨me afin de pouvoir, dans un second temps, implÃ©menter le systÃ¨me de faÃ§on schÃ©matique et moins complexe que celui du rÃ©seau Tor (original). On retrouvera donc dans l'ensemble de ce document Ã  la fois la partie thÃ©orique de mon travail reprenant les concepts sur lesquels reposent le rÃ©seau mais Ã©galement les dÃ©tails de mon implÃ©mentation permettant de retrouver et d'illustrer ces concepts. Je tiens Ã  remercier Monsieur FranÃ§ois GÃ©rard pour son aide prÃ©cieuse lors de la rÃ©daction et l'implÃ©mentation de ce travail. 
 \end{abstract}
 
 
 \section{Introduction}
-Selon la page officielle du projet Tor \cite{ref1}, ce dernier a pour objectif principal d'améliorer la vie privée des utilisateurs ainsi que la sécurité de ces derniers sur internet. Tor serait également, un outil efficace contre la censure permettant aux différentes personnes utilisant le réseau de pouvoir avoir accès aux contenus bloqués par différentes formes de régimes autoritaires. Tout au long de ce document, je détaillerai les différentes techniques informatique utilisées afin de pouvoir créer un réseau tel que Tor. Afin d'expliciter le mieux possible les différents concepts abordés, un réseau Tor simplifié a également été développé. Ce travail sera mis à disposition en annexe de ce document. Tor utilise au sein de son réseau différentes techniques de chiffrement et déchiffrement des messages. L'ensemble des termes directement liés à la sécurité ainsi que les techniques de chiffrement seront donc détaillés dans un premier temps afin de pouvoir ensuite expliciter le fonctionnement de Tor. Mon intérêt pour le réseau Tor est né de part ses techniques informatiques évoluées (que nous verrons dans la suite du document) mais également de part son aspect socio-politique important. Tor reste, à l'heure actuelle, un outil majeur pour la défense de la liberté d'expression dans certains pays. \\
+Selon la page officielle du projet Tor \cite{ref1}, ce dernier a pour objectif principal d'amÃ©liorer la vie privÃ©e des utilisateurs ainsi que l'anonymat de ces derniers sur internet. Tor serait Ã©galement un outil efficace contre la censure permettant aux personnes utilisant le rÃ©seau de pouvoir avoir accÃ¨s aux contenus bloquÃ©s par certaines formes de rÃ©gimes autoritaires. Tout au long de ce document, je dÃ©taillerai les techniques informatiques utilisÃ©es afin de pouvoir crÃ©er un rÃ©seau tel que Tor. Afin d'expliciter le mieux possible les diffÃ©rents concepts abordÃ©s, un rÃ©seau Tor simplifiÃ© a Ã©galement Ã©tÃ© dÃ©veloppÃ©. Ce dÃ©veloppement est repris en annexe du prÃ©sent document. Tor utilise au sein de son rÃ©seau diffÃ©rentes techniques de chiffrement et dÃ©chiffrement des messages. L'ensemble des termes directement liÃ©s Ã  la sÃ©curitÃ© ainsi que les techniques de chiffrement seront donc dÃ©taillÃ©s dans un premier temps afin de pouvoir ensuite expliciter le fonctionnement de Tor. Mon intÃ©rÃªt pour le rÃ©seau Tor est liÃ© aux techniques informatiques Ã©voluÃ©es (que nous verrons dans la suite du document) mais Ã©galement aux aspects socio-politiques. Tor reste, Ã  l'heure actuelle, un outil majeur pour la dÃ©fense de la libertÃ© d'expression dans certains pays. \\
 
-Avant d'aborder le coeur du sujet et les différents aspects technique de Tor, il est intéressant de se pencher un instant sur l'histoire de ce réseau. Si l'on se base sur la page officielle des membres du réseau Tor \cite{ref2}, on trouve deux noms importants à savoir Roger Dingledine et Nick Mathewson. Ces deux informaticiens (maintenant président et vice-président du projet) sont donc en effet à l'origine du réseau Tor. Il est important de noter que le routage en oignon, à savoir l'envoi de message enveloppé sous plusieurs couches distinctes, a été développé dans les année 1990 mais que le réseau (qui se base complètement sur cette technique) n'est sorti qu'en 2002 dans sa version alpha \cite{ref4} et c'est en 2004 que \og The Second-Generation Onion Router\fg est présenté. Enfin, ce n'est qu'en 2006 que \og The Tor Project\fg est créé \cite{ref3}. Ce dernier a pour objectif de maintenir et mettre à jour continuellement le réseau Tor \cite{ref1}.  \\
+Avant d'aborder le coeur du sujet et les diffÃ©rents aspects techniques de Tor, il est intÃ©ressant de se pencher un instant sur l'histoire de ce rÃ©seau. Si l'on se base sur la page officielle des membres du rÃ©seau Tor \cite{ref2}, on trouve deux noms incontournables Ã  savoir Roger Dingledine et Nick Mathewson. Ces deux informaticiens (aujourd'hui PrÃ©sident et Vice-PrÃ©sident du projet) sont Ã  l'origine du rÃ©seau. Il est important de noter que le routage en oignon, Ã  savoir l'envoi de messages enveloppÃ©s sous plusieurs couches distinctes, a Ã©tÃ© dÃ©veloppÃ© dans les annÃ©es 1990 mais que le rÃ©seau, basÃ© sur cette technique, n'a Ã©tÃ© rendu disponnible qu'en 2002 dans sa version alpha \cite{ref4} et c'est en 2004 que \og The Second-Generation Onion Router \fg est prÃ©sentÃ©. Enfin, c'est en 2006 que \og The Tor Project\fg a Ã©tÃ© crÃ©Ã© \cite{ref3}. Ce dernier a pour objectif de maintenir et mettre Ã  jour continuellement le rÃ©seau \cite{ref1}.  \\
 
-Comme dit précédemment, Tor a pour objectif d'améliorer la vie privée et la liberté des utilisateurs du réseau. Si l'on se réfère une fois de plus à \cite{ref1}, on constate que l'anonymat \footnote{Anonymat : Etat de quelque chose, quelqu'un qui est anonyme à savoir, dont l'auteur ou le nom est inconnu} total ne peut être atteint. Le réseau Tor représente donc un outil mis à disposition de manière libre et permettant aux utilisateurs de sécuriser \footnote{Sécuriser : Rendre quelque chose plus sûr, fiabiliser} le transport de leurs données d'un point A à un point B. On se rend donc compte que Tor ne permet en aucun d'assurer une anonymisation de l'utilisateur. Pour effectuer cette tâche, le groupe Tor Project conseille donc d'utiliser ce que l'on appelle un \og protocol-specific support software \fg qui permettra à l'utilisateur de masquer les données permettant de l'identifier. The Tor Project a également conçu un navigateur web permettant d'utiliser Tor tout en masquant et bloquant les possibilités d'identification de l'utilisateur. \\
+Si l'on se rÃ©fÃ¨re une fois de plus au site officiel de Tor \cite{ref1}, on constate que l'anonymat \footnote{Anonymat : Etat de quelque chose, quelqu'un qui est anonyme Ã  savoir, dont l'auteur ou le nom est inconnu} total ne peut Ãªtre atteint. Le rÃ©seau Tor reprÃ©sente donc un outil mis Ã  disposition de maniÃ¨re libre et permettant aux utilisateurs de sÃ©curiser \footnote{SÃ©curiser : Rendre quelque chose plus sÃ»r, fiabiliser} le transport de leurs donnÃ©es d'un point A Ã  un point B. Tor ne permet en aucun cas d'assurer une sÃ©curisation de l'utilisateur mais bel et bien d'anonymiser les requÃªtes effectuÃ©es par ce dernier. Afin d'assurer l'anonymat de l'utilisateur, le groupe Tor Project conseille d'utiliser ce que l'on appelle un \og protocol-specific support software \fg qui permettra de masquer les donnÃ©es permettant de l'identifier. The Tor Project a conÃ§u un navigateur web permettant d'utiliser Tor tout en masquant et bloquant les possibilitÃ©s d'identification de l'utilisateur. \\
 
-Dans la prochaine section, nous aborderons donc les techniques de chiffrage des données afin de pouvoir les faire transiter au sein du réseau de manière sécurisée. Suivra ensuite une seconde section permettant d'expliciter le fonctionnement du réseau Tor ainsi que l'utilisation du chiffrage des données au sein de ce dernier.
+Le corps de ce document sera dÃ©coupÃ© en trois grandes parties. La premiÃ¨re abordera les notions de chiffrements des donnÃ©es. Cette partie permettra de comprendre, dans le dÃ©tail, la faÃ§on dont fonctionne la modification d'apparence des informations. Nous poursuivrons ensuite avec les notions de routage en oignon (seconde section) pour enfin finir avec l'explication du systÃ¨me Tor (troisiÃ¨me section).
 
 \section{Chiffrement}
-La question de la sécurisation des données au sein du réseau Tor est un élément important si l'on souhaite comprendre correctement ce dernier. Il existe, à l'heure actuelle, deux techniques permettant de chiffrer des données à savoir : le chiffrement asymétrique et symétrique. Dans la suite de ce document, lorsque nous parlerons de sécurisation des données, cela reviendra à appliquer l'une de ces deux techniques de chiffrement sur un paquet de données. Dans cette section, je commencerai donc par détailler le principe du chiffrement asymétrique. Ce dernier sera également accompagné d'une application concrète (RSA \cite{ref5}). J'évoquerai donc dans un second temps le chiffrement symétrique en accompagnant également ce dernier d'une application concrète (AES \cite{ref8}). Dans le cas des deux techniques de sécurisation, il est important de comprendre que l'on applique une transformation sur les données. Les fonctions de chiffrage prennent donc une valeur en entrée et ressortent une valeur complètement différente en sortie. Les algorithmes mathématiques appliqués sur les données afin d'obtenir une valeur de sortie différente se basent sur l'utilisation de clés de chiffrement. Ce sont ces dernières (clés) qui varient en fonction du type de chiffrement appliqué (asymétrique ou symétrique). Voici une illustration permettant de schématiser de manière simple le fonctionnement d'une fonction de chiffrement (que l'on utilise la technique symétrique ou asymétrique) : \\ 
+La question de la modification des donnÃ©es au sein du rÃ©seau Tor est un Ã©lÃ©ment important si l'on souhaite en comprendre correctement le fonctionnement. Partant de la reprÃ©sentation d'un message, le chiffrement permet d'obtenir une reprÃ©sentation diffÃ©rente et non comprÃ©hensible du message originel. Dans les versions les plus anciennes, les mÃ©thodes de chiffrements nÃ©cessitaient un accord prÃ©alable entre les correspondants afin de pouvoir comprendre les messages Ã©changÃ©s. Cette mÃ©thode pouvait Ãªtre extrÃªmement complexe Ã  mettre en place si les correspondants n'avaient pas de moyens aisÃ©s et sÃ©curisÃ©s pour Ã©changer les informations nÃ©cessaires. C'est pour cette raison que des techniques plus Ã©voluÃ©es ont Ã©tÃ© mises en place. Avec ces nouvelles mÃ©thodes, l'objectif sera de simplifier l'Ã©change des informations sans risquer d'affaiblir la mÃ©thode de chiffrement. Il existe, Ã  l'heure actuelle, deux techniques permettant de chiffrer des donnÃ©es Ã  savoir : le chiffrement asymÃ©trique et symÃ©trique. Dans la suite de ce document, lorsque nous parlerons de chiffrement des donnÃ©es, cela reviendra Ã  appliquer un algorithme appartenant Ã  l'une de ces deux familles sur un paquet de donnÃ©es. Voici une illustration permettant de schÃ©matiser de maniÃ¨re simple le fonctionnement d'une fonction de chiffrement (que l'on utilise la technique symÃ©trique ou asymÃ©trique) : \\ 
 
 \begin{tikzpicture}
-\draw (-1.5,-0.25) node{Données} ;
-\draw (-1.5,-0.65) node{(non chiffrées)} ;
+\draw (-1.5,-0.25) node{DonnÃ©es} ;
+\draw (-1.5,-0.65) node{(non chiffrÃ©es)} ;
 \draw[->] (-0.4,-0.5) -- (0.15,-0.5);
 \pgfmathsetmacro{\cubex}{2}
 \pgfmathsetmacro{\cubey}{1}
@@ -45,49 +51,48 @@ La question de la sécurisation des données au sein du réseau Tor est un élément 
 \draw[black] (2.2,0,0) -- ++(-\cubex,0,0) -- ++(0,0,-\cubez) -- ++(\cubex,0,0) -- cycle;
 \draw (1.2,-0.47) node{Algorithme};
 \draw[->] (2.65,-0.5) -- (3.35,-0.5);
-\draw (4.1,-0.25) node{Données};
-\draw(4.1,-0.65) node{(chiffrées)};
+\draw (4.1,-0.25) node{DonnÃ©es};
+\draw(4.1,-0.65) node{(chiffrÃ©es)};
 \end{tikzpicture} \\
 
-Les clés évoquées précédemment sont donc utilisées par l'algorithme afin de pouvoir modifier les données fournies en entrée de ce dernier. On parle donc bien de paramètre fourni par l'utilisateur de l'algorithme de chiffrement afin que ce dernier fournisse une sortie définie par la clé. Pour finir, nous utiliserons dans le cadre de ce rapport des clés composées de différents caractères. Il est à noter que ces dernières peuvent être de toute forme à partir du moment ou l'algorithme permettant de chiffrer les données est capable d'utiliser cette dernière (câblage électrique, chaine de caractères, chaine binaire, ...)
-
-\subsection{Asymétrique}
-Le chiffrement asymétrique est donc la première approche que nous aborderons. Ce dernier est défini par l'utilisation de deux clés de chiffrement et déchiffrement (action inverse du chiffrement) \footnote{Action de déchiffrer à savoir lire ou comprendre un texte écrit peu lisiblement ou codé.} différentes et se base sur les fonctions à sens unique. Soit $n \in \mathbb{N} $ on pose $ A_n = \{ 1,2,...,n \} $ et $B_n$ deux ensembles finis. La fonction : 
+Dans cette section, je commencerai par dÃ©tailler le principe du chiffrement asymÃ©trique (RSA \cite{ref6}) afin de dÃ©velopper ensuite le chiffrement symÃ©trique (AES \cite{ref8}). Les algorithmes mathÃ©matiques appliquÃ©s sur les donnÃ©es afin d'obtenir une valeur de sortie diffÃ©rente se basent sur l'utilisation de clÃ©s de chiffrement. L'utilisation d'algorithmes symÃ©triques ou asymÃ©triques dÃ©finira la maniÃ¨re dont on effectuera l'Ã©change des clÃ©s permettant le chiffrement et dÃ©chiffrement des messages. Une fois Ã©changÃ©es, on utilisera ces clÃ©s afin de pouvoir appliquer une transformation des donnÃ©es. Les clÃ©s utilisÃ©es par les algorithmes peuvent Ãªtre de types diffÃ©rents (cÃ¢blage Ã©lectrique, chaine de caractÃ¨res, chaine binaire...). Nous utiliserons, dans le cadre de ce rapport, des clÃ©s composÃ©es de diffÃ©rents caractÃ¨res pouvant Ãªtre des chiffres ou des lettres.
+\subsection{AsymÃ©trique}
+Le chiffrement asymÃ©trique est le premier type de chiffrement que nous aborderons. Il est dÃ©fini par l'utilisation de deux clÃ©s diffÃ©rentes dont l'une permet de chiffrer les donnÃ©es et l'autre de les dÃ©chiffrer \footnote{Action de dÃ©chiffrer Ã  savoir lire ou comprendre un texte Ã©crit peu lisible ou codÃ©.}. Les algorithmes appartenant Ã  cette famille se basent sur les fonctions Ã  sens unique.
+\subsubsection{Fonctions Ã  sens unique} Soit $n \in \mathbb{N} $, on pose les ensembles finis suivants  $ A_n = \{ 1,2,...,n \} $ et $B_n$. La fonction : 
 \begin{center}
 $f_n : A_n \rightarrow B_n$
 \end{center}
-est définie comme à sens unique si : \vspace{0.03cm}
+est dÃ©finie comme Ã  sens unique si : \vspace{0.03cm}
 \begin{itemize}
-\item Il est facile de calculer $f_n(x)$ pour un $n$ très grand ($x \in A_n$). $\rightarrow$ $f_n$ facile à calculer .
-\item Il est difficile pour $y \in f_n(A_n)$ de trouver un $x$ tel que $f(x) = y$. $\rightarrow$ $f_n$ difficile à inverser. \vspace{0.1cm}
+\item[-] Il est facile de calculer $f_n(x)$ pour un $n$ trÃ¨s grand ($x \in A_n$). $\rightarrow$ $f_n$ facile Ã  calculer .
+\item[-] Il est difficile pour $y \in f_n(A_n)$ de trouver un $x$ tel que $f(x) = y$. $\rightarrow$ $f_n$ difficile Ã  inverser. \\
 \end{itemize}
-Les algorithmes de chiffrement asymétriques sont donc directement inspirés de ce principe. Si l'on applique ce principe sur une phrase à chiffrer, il est aisé d'appliquer la transformation dans un sens mais extrêmement difficile de retrouver le message originel. Il existe cependant bien deux solutions permettant de retrouver le message : effectuer l'ensemble des solutions (généralement exponentiel) ou posséder une clé permettant le déchiffrage. On déduit donc effectivement les deux clés cités précédemment: \vspace{0.03cm}
-\begin{itemize}
-\item Publique : permet de chiffrer le message (facile)
-\item Privée : permet de déchiffrer le message (difficile) \vspace{0.1cm}
-\end{itemize}
-Comme dit précédemment, l'utilisation de ce type d'algorithme reste néanmoins extrêmement lent même si l'on possède la clé dite privée. Ils restent cependant très utilisé grâce à leurs propriétés distribuées. L'algorithme le plus connu des systèmes asymétriques est connu sous le nom de RSA \cite{ref6}. Il a été développé en 1978 par Ron Rivest, Adi Shamir et Leonard Adleman \cite{ref7}. Ce dernier porte donc comme nom les initiales des ses trois créateurs. Rsa se définit donc par l'utilisation de deux clés différentes pour le chiffrement et le déchiffrement des données. Les étapes nécessaires à la génération des clés sont les suivantes : \vspace{0.03cm}
-\begin{itemize}
-\item[$1. $] Générer deux nombres premier $p$ et $q$
-\item[$2. $] Calculer $N = p*q$ et $\varphi(N) = (p-1)*(q-1)$
-\item[$3. $] Choisir un entier $e$, $1<e<\varphi(N)$ t.q $pgcd(e,\varphi(N)) = 1)$
-\item[$4. $] Calculer $d$ t.q $e*d \equiv 1 \mod \varphi(N)$
-\item[$5. $] La clé publique : $(N,e)$ ; La clé privée : $(d)$ \vspace{0.1cm}
-\end{itemize}
-On peut donc à présent calculer les fonctions permettant d'obtenir un message chiffré mais également d'effectuer l'opération inverse (déchiffrage).
-La fonction de chiffrement $e_K$ publique est donc définie par :
+On comprend alors pourquoi les algorithmes de chiffrement asymÃ©triques disposent de deux clÃ©s (publique et privÃ©e) et pourquoi l'action de dÃ©chiffrement des donnÃ©es est considÃ©rÃ©e comme extrÃªmement lente. MalgrÃ© la lenteur apparente des algorithmes de ce type, ils restent nÃ©anmoins largement utilisÃ©s lorsque la distribution de la clÃ© doit Ãªtre effectuÃ©e auprÃ¨s d'un grand nombre de personnes (ex : connexions internet Ã  un serveur sÃ©curisÃ©).
+\subsubsection{RSA}
+ L'algorithme le plus connu des systÃ¨mes asymÃ©triques est connu sous le nom de RSA \cite{ref6}. Il a Ã©tÃ© dÃ©veloppÃ© en 1978 par Ron Rivest, Adi Shamir et Leonard Adleman \cite{ref7}. Ce dernier porte comme nom les initiales de ses trois crÃ©ateurs et se dÃ©finit par l'utilisation de deux clÃ©s diffÃ©rentes pour le chiffrement et le dÃ©chiffrement des donnÃ©es. Afin de pouvoir utiliser cet algorithme, il faut commencer par choisir deux nombres premiers $p$ et $q$. A partir de ces deux nombres, on calcule alors $N = p*q$ pour enfin obtenir : \vspace{-0.2cm}
+\begin{equation}
+\varphi(N) = (p-1)*(q-1)\vspace{-0.1cm}
+\end{equation}
+On choisit ensuite un entier $e$ pour lequel les deux Ã©quations suivantes doivent Ãªtre respectÃ©es : \vspace{-0.2cm}
+\begin{equation}
+1 < e < \varphi(N)
+\end{equation}\vspace{-0.5cm}
+\begin{equation}
+pgcd(e,\varphi(N)) = 1)
+\end{equation}
+Les valeur de $e$ et de $\varphi(N)$ sont alors utilisÃ©es pour calculer la valeur de $d$ suivant la dÃ©finition :\vspace{-0.2cm}
+\begin{equation}
+e*d \equiv 1 \mod \varphi(N) \vspace{-0.1cm}
+\end{equation}
+On peut alors, Ã  partir des valeurs obtenues, crÃ©er une clÃ© privÃ©e ($d_K(c)$) ainsi qu'une clÃ© publique ($e_K(m)$) que l'on utilisera par la suite pour chiffrer et dÃ©chiffrer nos donnÃ©es : 
 \begin{center}
+$d_K(c) := c^d \mod N$  \vspace{0.2cm} \\
 $e_K(m) := m^e \mod N$
-\end{center} 
-La fonction de déchiffrement quand à elle est définie par :
-\begin{center}
-$d_K(c) := c^d \mod N$
 \end{center}
-Il est à noter que les fonctions de chiffrement et déchiffrement sont commutatives. Dans le cas ou le message est chiffré à partir de la fonction $e_k(m)$ (resp. $d_K(c)$) il peut alors être déchiffré par $d_K(c)$ (resp. $e_K(m)$). \\
-
+RSA est fondÃ© sur l'utilisation de grands nombres ainsi que la difficultÃ© de factoriser ces derniers \cite{ref6}. Il n'existe cependant Ã  l'heure actuelle aucune preuve mathÃ©matique permettant d'affirmer l'Ã©quivalence entre le problÃ¨me de factorisation et le dÃ©chiffrement aisÃ©. On se base donc principalement sur des intuitions mathÃ©matiques. L'utilisation de grands nombres signifie utiliser des clÃ©s d'au moins 1024 bits. \\
 \begin{tikzpicture}
-\draw (-3.15,-0.25) node{Données} ;
-\draw (-3.15,-0.65) node{(non chiffrées)} ;
+\draw (-3.15,-0.25) node{DonnÃ©es} ;
+\draw (-3.15,-0.65) node{(non chiffrÃ©es)} ;
 \pgfmathsetmacro{\cubex}{2.3}
 \pgfmathsetmacro{\cubey}{1}
 \pgfmathsetmacro{\cubez}{1}
@@ -95,8 +100,8 @@ Il est à noter que les fonctions de chiffrement et déchiffrement sont commutativ
 \draw[black] (-2,0,0) -- ++(0,0,-\cubez) -- ++(0,-\cubey,0) -- ++(0,0,\cubez) -- cycle;
 \draw[black] (-2,0,0) -- ++(-\cubex,0,0) -- ++(0,0,-\cubez) -- ++(\cubex,0,0) -- cycle;
 \draw (-0.25,-0.47) node{RSA};
-\draw (2.2,-0.25) node{Données};
-\draw (2.2,-0.65) node{(chiffrées)};
+\draw (2.2,-0.25) node{DonnÃ©es};
+\draw (2.2,-0.65) node{(chiffrÃ©es)};
 pgfmathsetmacro{\cubex}{2}
 \pgfmathsetmacro{\cubey}{1}
 \pgfmathsetmacro{\cubez}{1}
@@ -105,11 +110,11 @@ pgfmathsetmacro{\cubex}{2}
 \draw[black] (3.3,0,0) -- ++(-\cubex,0,0) -- ++(0,0,-\cubez) -- ++(\cubex,0,0) -- cycle;
 \draw[red, thick,rounded corners=8pt,->] (-2,0)--(-0.5,0.5) node[yshift=0.2cm]{$e_K(m)$} --(1,0);
 \draw[red, thick,rounded corners=8pt,<-] (-2,-1)--(-0.5,-1.5) node[yshift=-0.2cm]{$d_K(c)$} --(1,-1);
-\end{tikzpicture}
-RSA est fondé sur l'utilisation de grands nombre ainsi que la difficulté de factoriser ces derniers \cite{ref6}. Il n'existe cependant à l'heure actuelle aucune preuve mathématique permettant de prouver l'équivalence entre le problème de factorisation et le déchiffrement aisé. On se base donc principalement sur des intuitions mathématiques. L'utilisation de grands nombres signifie utiliser des clés d'au moins 1024 bits. 
+\end{tikzpicture} \newline
+Il est Ã  noter que les fonctions de chiffrement et dÃ©chiffrement appliquÃ©es sont commutatives. 
 
-\subsection{Symétrique}
-Il sera maintenant question du second type de chiffrement à savoir symétrique. Ce dernier se base sur un principe complètement différent du chiffrement asymétrique. En effet, la clé de chiffrement et déchiffrement utilisée dans ce cas-ci est unique et identique. Le chiffrement symétrique se divise également en deux grandes catégories à savoir le chiffrement par bloc (que nous verrons par la suite) et le chiffrement par flot (que nous n'aborderons pas ici) \cite{ref9}. Avant d'entamer les notions de chiffrement par bloc, il est important de souligner la différence majeure entre les fonctions de chiffrement symétriques et asymétriques. Il a été dit précédemment que le fonctionnement de ces dernières était extrêmement lent. Cela n'est pas le cas pour les systèmes symétriques qui s'appuient sur des fonctions inversibles et efficaces \cite{ref9}. Un algorithme de chiffrement symétrique se définit donc comme la transformation d'un message M avec une clé secrète K. Le résultat est donc un message chiffré C.  \\
+\subsection{SymÃ©trique}
+Abordons Ã  prÃ©sent le second type de chiffrement Ã  savoir symÃ©trique. Dans ce cas, les clÃ©s de chiffrement et dÃ©chiffrement correspondent a une et une seule clÃ©. Il n'est donc plus question de rendre publique l'une des deux clÃ©s mais bien de communiquer la clÃ© secrÃ¨te de maniÃ¨re sÃ©curisÃ©e. Le chiffrement symÃ©trique se divise Ã©galement en deux grandes catÃ©gories Ã  savoir le chiffrement par bloc (que nous verrons par la suite) et le chiffrement par flot \cite{ref9}. Voyons premiÃ¨rement la diffÃ©rence qui existe par rapport au chiffrement asymÃ©trique. La mÃ©thode symÃ©trique tire son avantage de par sa rapiditÃ© de dÃ©chiffrage des donnÃ©es. Elle s'appuie sur des fonctions inversibles et efficaces \cite{ref9}. Un algorithme de chiffrement symÃ©trique se dÃ©finit comme la transformation d'un message M avec une clÃ© secrÃ¨te K. Le rÃ©sultat est un message chiffrÃ© C :  \\
 
 \begin{tikzpicture}
 \draw (-3.5,-0.5) node{$M = \{ 0,1 \}^n$} ;
@@ -126,73 +131,122 @@ Il sera maintenant question du second type de chiffrement à savoir symétrique. C
 \draw (2.5,-0.5) node{$C = \{ 0,1 \}^n$};
 \draw (-0.35,-2) node{$K = \{ 0,1 \}^k$};
 \end{tikzpicture}
-Comme dit précédemment, les algorithmes à chiffrement symétrique fonctionnent généralement par blocs. On voit alors que le message est traités par morceaux de données de tailles équivalentes \footnote{On découpe le message en blocs de tailles équivalents}. On effectue donc un premier traitement durant lequel on découpe le message afin d'obtenir une succession de blocs pouvant être traités par la suite par l'algorithme. Comme dit dans \cite{ref10}, il existe deux principes fondamentaux qui sont utilisés dans le chiffrement symétrique par blocs. Le premier étant la confusion \footnote{Masquer toute relation linéaire entre le chiffré et le message en clair} et le second la diffusion \footnote{Cacher la redondance en répartissant l?influence d?un bit de clé sur tout le chiffré}. Ces deux notions seront donc à la base des algorithmes de chiffrement et seront appliqués sur les blocs cités précédemment. Il faut également prendre en compte un dernier point à savoir l'inversibilité de la fonction de chiffrement symétrique. Etant donné que la méthode prend comme principale propriété le fait de pouvoir retomber sur le message à partir de la clé de chiffrement, on dit que les fonctions de chiffrement symétrique sont bijectives. Afin d'illustrer au mieux le fonctionnement d'un chiffrement symétrique, nous utiliserons dans ce rapport le système AES (Advanced Encryption Security) qui a été développé dans les années 2000 \cite{ref10}. Concrètement, AES est basé sur un algorithme itératif. En fonction de la taille de la clé (128 ou 256 bits), l'algorithme verra son nombre de tours modifié (resp. 10 ou 14 tours). A chaque tour, on a donc dans un premier temps une confusion qui est assurée par une substitution non-linéaire suivie d'une diffusion quand à elle assurée par permutation linéaire. Voici donc le détail des différentes étapes nécessaires. 
-\subsubsection{Etape 1.}On commence donc par placer l'ensemble des données (sous forme d'octets) dans une matrice 4*4 (128 bits au total). Cette étape constitue donc une étape préliminaire qui ne sera pas effectuée lors des différentes itération. On a donc l'ensemble des données représentées sous la forme suivante : 
+Les algorithmes Ã  chiffrement symÃ©trique fonctionnent gÃ©nÃ©ralement par bloc ce qui implique que le message est alors traitÃ© par morceaux de donnÃ©es de tailles Ã©quivalentes \footnote{On dÃ©coupe le message en blocs de tailles Ã©quivalentes}. La technique consiste Ã  effectuer un premier traitement durant lequel on dÃ©coupe le message afin d'obtenir une succession de blocs pouvant Ãªtre traitÃ©s. Comme mentionnÃ© dans le cours de Monsieur Ferradi \cite{ref10}, il existe deux principes fondamentaux qui sont utilisÃ©s dans le chiffrement symÃ©trique par blocs Ã  savoir : la confusion et la diffusion.
+\subsubsection{Confusion} Masquer toute relation linÃ©aire entre le chiffrÃ© et le message en clair. \vspace{-0.2cm}
+\subsubsection{Diffusion} Cacher la redondance en rÃ©partissant l'influence d'un bit de clÃ© sur tout le chiffrÃ©. \vspace{0.3cm}
 
-\subsubsection{Etape 2.} 
+\noindent Ces deux techniques seront donc appliquÃ©es sur chaque bloc pris indÃ©pendamment l'un de l'autre. Pour finir, remarquons Ã©galement que les fonctions de chiffrement symÃ©trique sont Ã©galement inversibles. Il en dÃ©coule que ces fonctions sont bijectives. Afin d'illustrer au mieux le fonctionnement d'un chiffrement symÃ©trique, nous utiliserons dans ce rapport le systÃ¨me AES (Advanced Encryption Security).
 
+\subsubsection{EAS} Il a Ã©tÃ© dÃ©veloppÃ© dans les annÃ©es 2000 et est basÃ© sur un algorithme itÃ©ratif. Le nombre d'exÃ©cutions sera directement liÃ© Ã  la taille de la clÃ© utilisÃ©e Ã  savoir 128 ou 256 bits (10 ou 14 itÃ©rations). Pour chaque itÃ©ration, l'algorithme effectuera une action de confusion (substitution non-linÃ©aire) suivie d'une diffusion (permutation linÃ©aire). De maniÃ¨re exacte, AES commence par placer l'ensemble des donnÃ©es (sous forme d'octets) dans une matrice 4*4 (128 bits maximum) :
+\begin{center}
+	$\begin{bmatrix}
+	a_{11} & a_{12} & a_{13} & a_{14} \\
+	a_{21} & a_{22} & a_{23} & a_{24} \\
+	a_{31} & a_{32} & a_{33} & a_{34} \\
+	a_{41} & a_{42} & a_{43} & a_{44} \\
+	\end{bmatrix}$
+\end{center}
+Il effectue ensuite l'opÃ©ration XOR \footnote{Ou exclusif} pour chaque byte avec le byte correspondant dans la clÃ© fournie (128 bits) Ã  savoir : 
+\begin{center}
+$A_{i,j} \oplus K_{i,j} = B_{i,j}$
+\end{center}
+AES construit ensuite une transformation non-linÃ©aire (Ã  savoir la confusion) couramment appelÃ©e \og SubBytes \fg : 
+\begin{center}
+\includegraphics[scale=0.7]{imageADD.png}\\
+\end{center}
+Une fois la transformation non-linÃ©aire obtenue, il faut appliquer la transformation linÃ©aire de la matrice rÃ©sultante. Il s'agit alors de la diffusion citÃ©e prÃ©cÃ©demment. AES applique une transformation circulaire vers la gauche : 
+\begin{center}
+\includegraphics[scale=0.165]{imageStep4}\\
+\end{center}
+Pour finir, l'algorithme applique un mÃ©lange des colonnes de la matrice finale : 
+\begin{center}
+\includegraphics[scale=0.17]{image4}\\
+\end{center}
+On a maintenant le dÃ©tail de l'ensemble des Ã©tapes Ã  effectuer afin d'obtenir un message chiffrÃ© via le systÃ¨me AES.
 
+\subsection{Echange de clÃ©s}
+AprÃ¨s avoir dÃ©taillÃ© les deux mÃ©thodes existantes pour chiffrer et dÃ©chiffrer des messages, il en rÃ©sulte que chacune a ses avantages et ses inconvÃ©nients. L'objectif serait de combiner la rapiditÃ© d'exÃ©cution de la mÃ©thode symÃ©trique avec les avantages de la clÃ© publique dans le cas des systÃ¨mes asymÃ©triques. Pour ce faire, une des techniques les plus rÃ©pandues repose sur l'Ã©change de clÃ©s symÃ©triques au travers d'un chiffrement asymÃ©trique. Prenons, Ã  titre d'exemple, le cas d'un Ã©change client-serveur. Le client va alors rÃ©cupÃ©rer la clÃ© publique du serveur afin de pouvoir appliquer un chiffrement asymÃ©trique (RSA) sur une clÃ© de chiffrement symÃ©trique (AES) qu'il aura lui-mÃªme gÃ©nÃ©rÃ©. Il va alors initier une communication avec le serveur qui permettra d'Ã©changer la clÃ© symÃ©trique. Une fois l'Ã©change terminÃ©, les deux entitÃ©s (client/serveur) pourront alors communiquer Ã  l'aide d'un systÃ¨me efficace (rapide). On peut Ã©galement, lorsque l'on souhaite augmenter la sÃ©curitÃ©, renouveler la clÃ© symÃ©trique aprÃ¨s un certains temps ou un certain nombre d'Ã©changes. Afin d'Ãªtre le plus complet possible, il est Ã  noter qu'il existe d'autres types d'Ã©changes de clÃ©s. L'un des plus connus (que nous ne dÃ©taillerons pas ici) est l'Ã©change de clÃ©s Diffie-Hellman. Il est intÃ©ressant de souligner que cette mÃ©thode n'utilise en aucun cas le chiffrement asymÃ©trique. Cet aspect permet donc une plus grande rapiditÃ©.
 
-\section{Architecture}
-\subsection{Introduction}
-Comme dit précédemment, chaque message parcourant le réseau Tor est encapsulé dans une structure sous forme d'oignon. Le message encapsulé passe également par une série de proxy avant d'atteindre le destinataire. Afin de comprendre un tel mécanisme, il est intéressant de se pencher sur le fonctionnement des différents éléments constituant le réseau. En premier lieu, nous aborderons donc les clients (qui se connectent au réseau), nous détaillerons ensuite les noeuds du système (qui permettent de \og noyer \fg{} le message) et pour finir nous expliquerons la façon dont les noeuds sont distribués via les serveurs Tor. Nous émettrons l'hypothèse, pour cette section, que les messages échangés sont sécurisés. L'aspect cryptographique de Tor fera, en effet, l'objet d'une section dédiée dans la suite de ce travail afin de pouvoir approfondir certains aspects importants du réseau. 
+\section{ProblÃ¨me d'anonymat}
+L'anonymisation des donnÃ©es Ã©changÃ©es au travers du rÃ©seau internet est une des principales problÃ©matiques de ces dix derniÃ¨res annÃ©es. Il est en effet de plus en plus courant d'entendre, via les diffÃ©rents mÃ©dias, diverses histoires d'Ã©coutes informatiques. Ces derniÃ¨res reposent gÃ©nÃ©ralement sur le lien existant entre deux entitÃ©s communicantes. Si nous prenons par exemple le cas d'un Ã©change client-serveur, on pourrait imaginer d'intercepter les Ã©changes effectuÃ©s par l'ensemble des utilisateurs se connectant Ã  ce serveur. Cela mettrait alors en pÃ©ril l'anonymat des individus. L'analyse du traffic pourrait, dans un premier temps, porter prÃ©judice Ã  la vie privÃ©e mais Ã©galement, dans un second temps, porter atteinte Ã  la libertÃ© d'autrui. Si l'on prend l'exemple d'un rÃ©gime autoritaire souhaitant restreindre l'accÃ¨s Ã  certains sites internet, il va alors, en analysant les donnÃ©es transitant sur le rÃ©seau des utilisateurs, bloquer les diffÃ©rents accÃ¨s aux sites non dÃ©sirÃ©s. On aperÃ§oit bel et bien l'apparition d'une forme de censure. L'une des rÃ©ponses apportÃ©es au problÃ¨me d'anonymat est le routage en oignon. Ce procÃ©dÃ©, qui sera dÃ©taillÃ© dans la suite de la section, est Ã©galement le fondement mÃªme du rÃ©seau Tor. Il sera donc primordial d'en comprendre les fondements.
 
-\subsection{Client}
-Il est intéressant, dans un premier temps, d'aborder la notion de clients. Ce sont eux qui se connectent au réseau afin d'effectuer des requêtes auprès de serveurs web ou d'échanger des messages de manière anonyme. L'implication des clients reste minimale. En effet, ils se connectent au réseau mais n'effectuent aucune modification sur ce dernier. Il est important de signaler également que ce sont eux qui doivent être protégés. C'est donc pour les clients que le projet Tor a été créé et c'est pour cette raison que l'association Tor Project a mis en place plusieurs outils permettant une simplification d'utilisation. Cependant, il faut noter que les clients peuvent également configurer eux-même les outils Tor. Pour cette raison, le réseau ne bloque pas l'accès via une application unique mais permet bel et bien l'utilisation à toutes les personnes ayant configuré leur système afin d'accéder au réseau. Lorsqu'un client utilise le réseau, il a un certain nombre de tâches à effectuer. Dans un premier temps, il est utile de sélectionner un chemin à parcourir avant d'arriver à la destination. Dans mon implémentation personnelle, ce chemin est constitué de trois noeuds ce qui reflète bien le schéma réel. Une fois le chemin obtenu, le client peut donc transmettre des message au sein du réseau. Pour ce faire, il lui est utile de formater ces messages sous la forme d'un oignon (utilisation de l'oignon routing). Une fois le message empaqueté, il peut être distribué sur le réseau. A partir de ce moment, la mission du client est terminée et le réseau Tor s'occupe du reste. Pour conclure la partie concernant le client, voici donc les 4 étapes majeures de ce dernier : 
-\begin{itemize}
-\item Récupération de la liste des noeuds publics
-\item Création d'un chemin possible pour les messages
-\item Empaquetage du message sous le bon format
-\item Envoi du message au premier noeud du circuit
-\end{itemize}
-
-\subsection{Noeuds}
-L'un des points les plus importants du réseau Tor réside bel et bien dans son architecture interne à savoir les noeuds. Ces derniers constituent un ensemble de proxy (notation souvent utilisée dans diverses sources) améliorés afin d'obtenir une confidentialité maximale aux clients. Lorsque ces derniers se connectent au réseau et constituent un chemin, ils choisissent de préférence des noeuds situés dans différents pays. Le circuit sera alors constitué d'un noeud d'entrée (Entry Guard Node), suivi d'un noeud intermédiaire et non publique (Bridge Node) et finira avec un noeud de sortie (Exit Node). Dans un schéma réel, les noeuds de sortie constituent un point de faiblesse puisqu'ils sont en lien direct avec l'extérieur (serveurs, ...). Lorsque la connexion n'est pas sécurisée, le noeud de sortie sera capable de lire et d'écouter l'ensemble des informations transmises. Dans mon implémentation personnelle, la notion de noeuds d'entrée ou de sortie n'existe pas. Afin de simplifier le programme, un seul type de noeud a été mis en place. Le client choisit dans une liste fournie quels noeuds seront empruntés (3 différents). Les noeuds ont donc un rôle majeur au sein du réseau. Ce sont eux qui vont recevoir les messages, les traiter et les renvoyer à l'endroit souhaité. Lorsque l'on parle de traitement, on sous-entend l'action d'enlever la couche inutile au message reçu afin d'obtenir une couche inférieure de l'oignon (nouveau message). Une fois ce niveau inférieur découvert, le noeud connait le destinataire suivant (noeud ou client). Afin de visualiser de manière simple le trajet d'un message au sein du réseau, voici une illustration de la propagation à l'aide des noeuds : 
-\begin{center} \includegraphics[scale=0.21]{image1} \end{center}
-La gestion des messages par les différents noeuds représente un point crucial au sein du réseau Tor. Cela représente également l'une des failles principales. En effet, l'ensemble des noeuds sont mis à disposition par des utilisateurs lambda ou par des associations créées afin de lutter en faveur de la liberté d'expression. Chaque noeud est vérifié par l'association Tor project mais leurs compétences ont également des limites. Il existe, en effet, un certains nombre de failles qui permettent à certains utilisateurs de créer des noeuds espions qui seront référencés comme corrects par le système. L'attaque la plus connue qui a touché le réseau Tor se nomme : Man In The Middle (l'Homme du Milieu). Cette faille consiste à filtrer et analyser le traffic passant par le noeud créé à cette fin. Afin de réduire les risques d'attaques et d'espionnages, il existe une hiérarchie au niveau des noeuds. Cette hiérarchie fait évoluer le noeud au fur et à mesure du temps en filtrant les éventuels noeuds espions. Ce système n'est évidement pas infaillible mais il permet de réduire la masse de noeuds infectés. Il est à noter que la certification du noeud peut prendre, en moyenne, une septentaine de jours. Pour finir, voici donc les différentes étapes nécessaires à la création d'un noeud : 
-\begin{itemize}
-\item Réception du message
-\item Traitement (+ TImer)
-\item Envoi à l'étape suivante
-\end{itemize}
-
-\subsection{Serveurs}
-% \begin{center}
-% \includegraphics[scale=0.38]{image2}
-% \end{center}
-Pour obtenir un aperçu complet de l'architecture du réseau Tor, il nous reste à aborder un dernier point à savoir les serveurs. Ces derniers sont indispensables au bon fonctionnement du réseau puisqu'ils permettent d'enregistrer l'ensemble des noeuds actifs accessibles mais également le statut de ces derniers. Les serveurs Tor sont appelés Directory Authorities et permettent en effet d'apporter un certain contrôle à ce dernier. Dans la pratique, ces serveurs sont au nombre de neuf et sont maintenus par l'association Tor Project. Ces derniers sont codés en \og dur \fg{} au sein du réseau et représentent également l'un des points critiques du système. La fonction première de ces serveurs est, dans un premier temps, de maintenir une liste des noeuds accessibles et, dans un second temps, de distribuer cette liste afin de pouvoir obtenir un noeud d'entrée dans le réseau. Au sein de mon implémentation, les Directory Authorities ont été représentées par un unique serveur sur lequel les noeuds s'enregistrent. La complexité et la taille de mon implémentation étant réduite par rapport au projet Tor réel, un unique serveur était suffisant. Une fois qu'un nombre suffisant de noeuds est enregistré (au minimum trois) sur le serveur, les clients peuvent alors obtenir la liste de ces noeuds afin de pouvoir créer un circuit personnel au sein du réseau. Le serveur est donc, dans notre cas, une partie de l'implémentation extrêmement simple. La complexité réelle de ces derniers dans le cas de Tor est bel et bien réelle. Ils doivent notamment faire face à des attaques récurrentes mais également assurer que les noeuds enregistrés sont corrects et légitimes. Le nombre élevés de serveurs est principalement lié à ces deux raisons. Une liste identique est effectivement maintenue par l'ensemble de ces serveurs ce qui permet d'assurer un service permanent du réseau. Pour résumer, voici donc les grands points qui ont été abordés et implémentés afin d'offrir les services des directory authorities : 
-\begin{itemize}
-\item Connexion des noeuds
-\item Enregistrement des noeuds sur le serveur
-\item Distribution de la liste publique
-\end{itemize}
-
-
-\section{Fonctionnement}
-\subsection{Introduction}
-Nous avons jusqu'à présent détaillé l'architecture interne du réseau Tor. Il est maintenant intéressant de s'attarder sur les mécanismes internes de fonctionnement du réseau. Ces derniers regroupent le mode de transmission des messages, la façon dont sont sécurisées les données ainsi que la création d'un circuit au sein du réseau. L'ensemble de ces aspects seront donc détaillés dans cette nouvelle section. Nous aurons, à la fin de cette seconde partie, détaillé l'ensemble des éléments nécessaires à l'implémentation d'un réseau Tor simplifié à savoir : l'architecture et le fonctionnement de ce dernier. Il est utile de préciser une seconde fois que le réseau implémenté a été volontairement simplifié afin de mettre en lumière les concepts généraux définissant Tor. Afin d'obtenir une structure cohérente, la suite de cette section sera organisée de façon similaire à l'initialisation d'un client au sein de mon projet. Pour ce faire, nous commencerons donc par détailler la création d'un circuit, suivra ensuite l'échange de clés entre le client et les différents noeuds. Nous finirons donc par expliquer l'envoi et la réception de messages entre clients dans le cadre d'une messagerie instantanée.
-
-\subsection{Circuits}
-La création d'un circuit au sein du réseau constitue la première étape du client. Ce dernier commence par récupérer auprès du serveur (l'un des directory authorities) la liste des noeuds accessibles. Une fois cette liste obtenue, le client est donc en mesure de se créer un chemin au sein de l'infrastructure. Dans le cas de Tor, les noeuds sont choisis dans un ordre spécifique. Le client commence par le noeud de sortie (exit node). Une fois ce dernier obtenu, le système choisit alors un noeud d'entrée et de relais. L'ensemble de ces opérations sont effectuées de manière sécurisée par le client mais également de manière transparente pour l'utilisateur lambda. Cependant, il est important de souligner que le choix des noeuds est un des aspects majeurs du réseau. Dans le cas où ces derniers seraient mal choisis, cela pourrait mettre en péril la sécurité de l'utilisateur ainsi que la confidentialité de ses communications. C'est pour cela que le choix des noeuds est effectué dans un ordre spécifique mais également, que les noeuds choisis doivent avoir le moins de liens possibles entre eux. Pour ce faire, Tor privilégie les noeuds se situant à une distance élevée (dans le meilleur des cas le pays doit être différent). Comme dit dans la section précédente, les noeuds de sorties sont un point critique de l'implémentation. On remarque donc également que ces derniers sont choisis en premier et de manière individuelle. Cela met donc bien en évidence les propriétés évoquées précédemment. Pour conclure, il est à noter que les circuits sont des éléments temporaires à intervalle de temps spécifique. Cette mesure de sécurité permet d'éviter qu'un chemin ne soit découvert et mis sous écoute.
-
-\subsection{Messages}
-L'ensemble des messages échangés sur le réseau Tor sont protégés. Pour ce faire, il faut appliquer un format spécifique à ces derniers qui sera lisible dans l'ensemble des cas par les différents noeuds. Dans le cadre de mon implémentation, ce format a été simplifié. Cependant, l'idée générale est exactement la même dans le projet Tor. Les messages circulants au sein du réseau peuvent donc être vus comme des cellules disposant elles-même de sous-cellules de tailles fixes. Chaque message dispose donc de plusieurs éléments à savoir un message chiffré (ou non dans le cas ou l'on se trouve sur le dernier noeud), une destination mais également une éventuelle clé (détaillé dans la section suivante). Afin d'être le plus compréhensible possible, voici, une représentation schématique d'un message : 
+\subsection{Routage en oignon}
+Le routage en oignon (Onion routing) a Ã©tÃ© dÃ©veloppÃ© par un mathÃ©maticien et deux informaticiens du nom de Paul Syverson, Macheal G Reed et David Goldschlag dans les bureaux de la marine amÃ©ricaine. l'objectif de ces trois hommes Ã©tait d'empÃªcher les Ã©coutes sur les communications de la marine des Etats-Unis \cite{ref11}. Pour comprendre correctement le fonctionnement de l'onion routing, revenons un instant sur l'objectif de celui-ci. Lorsqu'une connexion est Ã©tablie entre deux entitÃ©s, on s'aperÃ§oit qu'elle peut Ãªtre interceptÃ©e et Ã©coutÃ©e. Dans un premier temps, partons de l'idÃ©e que le chiffrement des donnÃ©es serait une solution Ã  notre problÃ¨me. Malheureusement, le fait d'appliquer un chiffrement au message ne rend pas ce dernier impossible Ã  suivre. La solution apportÃ©e par le routage en oignon sera alors d'insÃ©rer un certain nombre de passerelles (appelÃ©es noeuds) entre les deux entitÃ©s communicantes. Pour chaque message transitant dans le rÃ©seau, on appliquera un nombre de couches $n$ correspondant au nombre de noeuds intermÃ©diaires empruntÃ©s par le message. On procÃ©dera alors Ã  ce que l'on appelle une encapsulation des messages.
+\begin{center}
+\includegraphics[scale=0.3]{imageOnionRouting.png}
+\end{center}
+\subsubsection{Encapsulation de messages}
+Les messages utilisÃ©s seront formatÃ©s sous la forme d'oignons. L'idÃ©e est d'imbriquer les messages les uns dans les autres sur le modÃ¨le des poupÃ©es russes. Pour obtenir une illustration concrÃ¨te, basons nous sur le message suivant : 	
 \begin{table}[!htbp]
 \centering
 \begin{tabular}{|l|l|l|}
 \hline
-Noeud & Clé & Message (crypté) \\ \hline
+Noeud & ClÃ© & Message \\ \hline
 \end{tabular}
 \end{table}
 \newline
-Comme dit précédemment, la caractéristique principale du routage en oignon est l'encapsulation des messages. Pour ce faire, chaque noeud doit être capable d'effectuer un traitement sur les messages reçu afin de pouvoir obtenir le message suivant. Lorsqu'un noeud reçoit donc un message de la forme précédente, il en extrait la valeur de la cellule message et la décrypte à l'aide d'une clé spécifique. Le nouveau message obtenu est du même format que le message précédent et peut être injecté à nouveau sur le réseau vers le noeud suivant. Par souci de facilité, mon implémentation ne prend pas en compte les différents types de noeuds. Cela implique que les noeuds de sorties n'existent pas. Lorsque le message atteint son dernier point relais, celui-ci est redirigé vers un dernier noeud fictif à savoir le client. L'ensemble de ces étapes doivent être effectuées par les différents noeuds. Cependant, afin de pouvoir procéder ainsi, il faut, au préalable, que le client ait envoyé le message correctement. Pour ce faire, il va devoir procéder à la création du message quatre fois. En récupérant à chaque itération le message précédent. Il commencera donc à chaque fois par initialiser le message arrivant au dernier noeud. Voici à nouveau un schéma reprenant les 4 itérations : 
+Une fois que nous avons Ã©tabli une structure du message, il nous est possible de construire un oignon pouvant transiter au sein du rÃ©seau. L'oignon sera alors construit de la faÃ§on suivante : \\
+\begin{table}[!htbp]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+Noeud & ClÃ© & Message \\ \hline
+\end{tabular}
+\begin{tikzpicture}[overlay]
+ \draw[black, line width=1pt] (-2.065,0.09) ellipse (3cm and 0.55cm);
+\end{tikzpicture} 
+\end{table}
+\begin{table}[!htbp]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+Noeud & ClÃ© & Message \\ \hline
+\end{tabular}
+\begin{tikzpicture}[overlay]
+ \draw[black, line width=1pt] (-2.065,0.09) ellipse (3cm and 0.55cm);
+\end{tikzpicture} 
+\end{table}
+\begin{table}[!htbp]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+Noeud & ClÃ© & Message \\ \hline
+\end{tabular}
+\begin{tikzpicture}[overlay]
+ \draw[black, line width=1pt] (-2.065,0.09) ellipse (3cm and 0.55cm);
+\end{tikzpicture} 
+\end{table}
 
+\begin{table}[!htbp]
+\centering
+%\hskip-.1cm
+\begin{tabular}{|l|l|l|}
+\hline
+Noeud & ClÃ© & Message \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{tikzpicture}[overlay]
+  \draw[->,rounded corners=8pt] (6.4,4.65)--(7,4.1)--(5.6,3.6);
+  \draw[->,rounded corners=8pt] (6.4,3.35)--(7,2.8)--(5.6,2.3);
+  \draw[->,rounded corners=8pt] (6.4,2.05)--(7,1.5)--(5.65,1.02);
+\end{tikzpicture} 
+
+\noindent Chaque pont intermÃ©diaire sera capable de supprimer une couche du message (de la mÃªme faÃ§on que l'on pelle un oignon) afin d'en obtenir un nouveau. On constate alors que l'apparence du message diffÃ¨re aprÃ¨s chaque passage par un noeud. Lorsqu'il entre dans un noeud sous un aspect $A$ et qu'il en ressort sous un autre aspect $B$, la mise en relation des deux messages est rendue plus difficile. Cette technique permettra de rendre le suivi du message beaucoup plus complexe. MalgrÃ© tout, si l'on se limite Ã  la modification du message, il est tout de mÃªme possible de tracer ce dernier. On relÃ¨vera par exemple la possibilitÃ© de calculer le temps de traitement d'un noeud intermÃ©diaire. Ce procÃ©dÃ© permettrait alors de faire correspondre les messages entrant avec ceux sortant du noeud. Pour Ã©viter cela, les noeuds sont en gÃ©nÃ©ral dotÃ©s de minuteurs alÃ©atoires intÃ©grants un temps entre le traitement et la redirection du message
+
+\section{Le rÃ©seau Tor}
+Tor est une implÃ©mentation immÃ©diate du systÃ¨me de routage en oignon dÃ©taillÃ© prÃ©cÃ©demment et est en lien direct avec la problÃ©matique d'anonymat. Pour comprendre la maniÃ¨re dont Tor fonctionne, nous en Ã©tudierons plusieurs composantes. Il sera dans un premier temps question des clients. Ce sont eux qui souhaitent pouvoir effectuer des requÃªtes de maniÃ¨re anonyme. Nous dÃ©taillerons ensuite les noeuds (passerelles) permettant l'utilisation des messages sous formes d'oignon. Pour finir, nous aborderons briÃ¨vement les diffÃ©rents rÃ©pertoires utilisÃ©s afin de rÃ©cupÃ©rer les points de connexions au rÃ©seau Tor (Directory Authorities). Cette section s'achÃ¨vera par le passage en revue des attaques existantes contre le rÃ©seau Tor.
+
+\subsection{Clients}
+Les clients souhaitant se connecter et utiliser le rÃ©seau Tor auront deux actions Ã  effectuer afin de pouvoir utiliser le rÃ©seau; la crÃ©ation d'un chemin et la crÃ©ation de messages. Elles seront rÃ©alisÃ©es de maniÃ¨re transparente pour l'utilisateur lorsqu'il utilisera par exemple le Tor Web Browser dÃ©veloppÃ© par The Tor Project.
+\subsubsection{CrÃ©ation d'un chemin} Lorsque le client se connecte au rÃ©seau Tor, il effectue en rÃ©alitÃ© une requÃªte lui permettant de rÃ©cupÃ©rer une liste de noeuds intermÃ©diaires accessibles. Ces diffÃ©rents noeuds seront ensuite utilisÃ©s dans le cadre du routage en oignon expliquÃ© prÃ©cÃ©demment. Le rÃ©seau Tor a pris comme convention l'utilisation de trois noeuds intermÃ©diaires. Une fois obtenus, il est donc possible pour le client de crÃ©er des messages et de les envoyer sur le rÃ©seau.
+\subsubsection{CrÃ©ation de messages} Les messages crÃ©Ã©s par le client seront quant Ã  eux directement liÃ©s au circuit obtenu prÃ©cÃ©demment \footnote{Le circuit est le chemin rÃ©sultant aprÃ¨s avoir choisi trois noeuds alÃ©atoires dans la liste de noeuds accessibles}. Ils disposeront, comme dÃ©taillÃ© prÃ©cÃ©demment, d'une structure sous forme d'oignon. \\
 \vspace{2pt}
 \begin{table}[!htbp]
 \centering
 \begin{tabular}{|l|l|l|}
 \hline
-Noeud & Clé & Message \\ \hline
+Noeud & ClÃ© & Message \\ \hline
 \end{tabular}
 \begin{tikzpicture}[overlay]
  \draw[black, line width=1pt] (-2.065,0.09) ellipse (3cm and 0.55cm);
@@ -203,7 +257,7 @@ Noeud & Clé & Message \\ \hline
 \centering
 \begin{tabular}{|l|l|l|}
 \hline
-Noeud & Clé & Message (crypté) \\ \hline
+Noeud & ClÃ© & Message (chiffrÃ©) \\ \hline
 \end{tabular}
 \begin{tikzpicture}[overlay]
  \draw[black, line width=1pt] (-2.65,0.09) ellipse (3cm and 0.55cm);
@@ -214,7 +268,7 @@ Noeud & Clé & Message (crypté) \\ \hline
 \centering
 \begin{tabular}{|l|l|l|}
 \hline
-Noeud & Clé & Message (crypté) \\ \hline
+Noeud & ClÃ© & Message (chiffrÃ©) \\ \hline
 \end{tabular}
 \begin{tikzpicture}[overlay]
  \draw[black, line width=1pt] (-2.65,0.09) ellipse (3cm and 0.55cm);
@@ -226,50 +280,48 @@ Noeud & Clé & Message (crypté) \\ \hline
 \hskip-.1cm
 \begin{tabular}{|l|l|l|}
 \hline
-Noeud & Clé & Message (crypté) \\ \hline
+Noeud & ClÃ© & Message (chiffrÃ©) \\ \hline
 \end{tabular}
 \end{table}
 
 \begin{tikzpicture}[overlay]
-  \draw[->,rounded corners=8pt] (6.4,4.8)--(7,4.4)--(6.2,3.8);
-  \draw[->,rounded corners=8pt] (6.4,3.5)--(7,3.1)--(6.2,2.45);
-  \draw[->,rounded corners=8pt] (6.4,2.16)--(7,1.8)--(6.2,1.1);
+  \draw[->,rounded corners=8pt] (6.4,4.95)--(7,4.4)--(6.2,3.8);
+  \draw[->,rounded corners=8pt] (6.4,3.55)--(7,3.1)--(6.2,2.45);
+  \draw[->,rounded corners=8pt] (6.4,2.2)--(7,1.8)--(6.2,1.1);
 \end{tikzpicture} 
 
-\subsection{Echanges de clés}
-L'ensemble des messages échangés au sein du réseau Tor doivent être protégés de toutes formes d'écoutes. Pour ce faire, un certain nombre de clés doivent être échangées afin de sécuriser les données transitant sur le réseau. Tor propose deux niveaux de sécurité à savoir : une sécurisation du message ainsi qu'une sécurisation du transport du message. Le procédé mis en place dans le cadre mon implémentation diffère légèrement de l'implémentation réelle de Tor. Cependant l'idée générale qui sera développée dans cette section est belle et bien identique. La sécurisation des données échangées passe, dans le cadre de Tor, par le système TLS. Ce protocole permet de sécuriser les échanges entre deux entités. Il permet également de rendre la lecture des données impossible. TLS (Transport Layer Security) prend en charge un grand nombre de fonctions permettant d'assurer l'intégrité des données mais également la cohérence des informations fournies par le serveur ou les noeuds de passage. Etant donné la complexité et le nombre de fonctionnalités proposées par TLS, le projet réalisé n'a pas été doté de ce dernier. Nous considérerons donc que les données échangées sont correctes et que les noeuds existants disposent des certificats adéquats. Lorsqu'un client initialise une connexion, il doit, dans un premier temps, échanger avec les différents noeuds des clés permettant de sécuriser et chiffrer les messages échangés. Il existe deux méthodes de cryptage permettant de sécuriser des données : 
-\begin{enumerate}
-\item Les clés asymétriques
-\item Les clés symétriques
-\end{enumerate}
-Dans le cadre de ce projet, nous utiliserons les deux ce qui est également le cas dans le projet Tor. Il existe cependant deux grandes différences entre ces dernières. Les clés asymétriques permettent de livrer une clé publique à l'ensemble des personnes souhaitant chiffrer leurs messages. Une fois le message transformé, il est impossible de le retrouver avec la même clé, il est donc nécessaire d'avoir une autre clé, privée cette fois, permettant de retomber sur le message initial. Ce procédé a été extrêmement généralisé grâce à l'utilisation du système RSA. L'avantage indiscutable de ce procédé est bel et bien le fait de pouvoir livrer la clé de manière publique sans risquer de compromettre la sécurité. On pourrait alors s'arrêter là en estimant que la mission est remplie. Ce serait une erreur majeure étant donné la lenteur de ce procédé. C'est donc à ce moment là que l'on fait intervenir les clés symétriques. Ces clés ont pour avantage, face au système asymétrique, leur rapidité bien plus élevée mais doivent cependant rester secrètes durant les transmissions. Etant donné les avantages et inconvénients développées ci-dessus, on peut donc en déduire qu'une combinaison des deux techniques pourrait être extrêmement avantageuse. On va donc utiliser les forces des deux systèmes afin de créer un système résultant parfaitement robuste. Pour ce faire, les clés asymétriques sont donc utilisées dans un premier temps. Ces dernières permettent d'initialiser les échanges entre le client et les différents noeuds choisit. Une fois la connexion établie, les communications seront alors protégées à l'aide des clés symétriques afin de pouvoir augmenter la rapidité du système.
-\subsubsection{Asymétriques} Lorsque les noeuds s'initialisent, ils envoient alors leurs informations au(x) serveur(s). Au sein de ces informations réside, l'adresse et le port de connexion mais également la clé publique. Lorsqu'un client souhaite initialiser un circuit, il va alors se connecter en cascade aux différents noeuds. Lors de la première connexion, le client crée un premier message sous la forme d'un oignon. A chaque couche (3) il insère une clé symétrique générée. Chaque clé symétrique est donc protégée par la clé asymétrique correspondant au noeud adéquat. Pour visualiser de manière correcte la façon dont ces clés sont imbriquées, il suffit de reprendre le schéma utilisé précédemment. Lorsqu'un noeud reçoit le premier message d'une connexion, il va donc enregistrer la clé symétrique correspondante afin de pouvoir échanger de manière plus rapide. Une dernière précision concernant l'implémentation réelle du système peut être apportée. Précédemment, il a été dit que l'implémentation réalisée ne connaissait pas les noeuds de sortie, ceci est uniquement partiellement vrai. En effet, chaque noeud, lorsqu'il reçoit sa clé symétrique, vérifie s'il est utile d'envoyer le message une étape plus loin. Dans le cas où ce n'est pas nécessaire, le message est mis à null. Le noeud est donc capable de savoir s'il est oui ou non le dernier maillon de la chaîne.
-\subsubsection{Symétriques} Une fois les clés échangées, le système peut donc utiliser la technique des clés symétriques. Ce procédé, comme dit précédemment, est beaucoup plus rapide mais également plus complexe à la mise en oeuvre. Pour des raisons de sécurité, le chemin emprunté par les messages est changé à un intervalle de temps régulier. Ce changement nécessite à nouveau l'échange de clés symétriques. Dans le cadre de mon projet, les clés utilisées sont des clés AES. Le projet Tor, utilise quant à lui, le procédé de Diffle-Hellman ce qui ne modifie pas grandement la manière de les utiliser. Cependant, la méthode utilisée afin d'échanger des clés Diffle-Hellman introduit certaines nuances non utilisées par mon implémentation. Afin d'utiliser ce procédé, il faut dans un premier temps définir un nombre premier $p$ et un nombre aléatoire $g$ inférieur à $p$. Une fois cette première étape effectuée, le client peut envoyer une clé $C$ au serveur obtenu de la manière suivante avec un nombre $c$ aléatoire : $C = g^{c}\ mod \ p $. Une fois que le serveur a fait de même, ils peuvent tout deux calculer la clé secrète de la façon suivante (exemple pour le client) : $S^{c}\ mod\ p$ (en sachant que $S$ est la clé envoyée par le serveur).
+\subsection{Noeuds}
+Maintenant que nous avons dÃ©taillÃ© les Ã©lÃ©ments liÃ©s Ã  l'utilisateur, il est intÃ©ressant d'analyser la maniÃ¨re dont les messages sont traitÃ©s par les noeuds. Les messages transitant sur le rÃ©seau peuvent en effet contenir diffÃ©rents types d'actions \cite{ref14}. On peut par exemple initialiser une nouvelle connexion ou la fermer, faire transiter un message, etc. Nous nous intÃ©resserons principalement Ã  deux fonctionnalitÃ©s Ã  savoir l'instanciation d'une connexion et le transit d'un message. 
+\subsubsection{Ouverture d'un circuit} Lorsqu'un client ouvre son circuit, ce dernier envoi un premier message de crÃ©ation. Dans ce cas, nous utiliserons un systÃ¨me de chiffrement asymÃ©trique permettant l'Ã©change de clÃ©s symÃ©triques. On trouvera dans la cellule \og noeud \fg l'adresse de la passerelle suivante et dans la cellule \og clÃ© \fg la clÃ© symÃ©trique correspondant au noeud. 
+\subsubsection{Transit de messages} Une fois le circuit initialisÃ©, les messages transitant par le rÃ©seau ne doivent plus contenir de clÃ©s symÃ©triques Ã©tant donnÃ© qu'elles ont Ã©tÃ© Ã©changÃ©es prÃ©cÃ©demment. Chaque noeud est donc considÃ©rÃ© comme une plateforme permettant de modifier l'aspect du message en le dÃ©chiffrant via sa clÃ© symÃ©trique. \\
+
+\subsection{Directory Authorities} La liste des noeuds accessibles est rÃ©cupÃ©rÃ©e auprÃ¨s de ce que l'on appelle les Directory Authorities \cite{ref1}. Ces derniers sont au nombre de 10 et sont maintenus par l'organisation The Tor Project. Ils reprÃ©sentent Ã©galement le coeur mÃªme du rÃ©seau. Une dÃ©faillance de ces serveurs entraÃ®nerait effectivement l'impossibilitÃ© de rÃ©cupÃ©rer de maniÃ¨re correcte les noeuds disponibles. Au vu du nombre restreint de serveurs prÃ©sents, on retrouve les adresses correspondantes directement Ã©crites dans le code du projet Tor. Voici leurs localisations : \vspace{0.2cm}
+\begin{center}
+\includegraphics[scale=0.38]{image2} \vspace{0.3cm}
+\end{center} 
+
+\subsection{Attaques}
+Maintenant que nous avons abordÃ© les trois Ã©lÃ©ments constituant le rÃ©seau ainsi que leurs interactions, il est intÃ©ressant d'observer les diffÃ©rents aspects pouvant toutefois rendre les utilisateurs vulnÃ©rables. Un certain nombre d'attaques peuvent porter sur ce rÃ©seau en mettant soit l'utilisateur soit le rÃ©seau en danger \cite{ref14}. Afin de pouvoir dÃ©tailler de maniÃ¨re exhaustive les diffÃ©rents types d'attaques possibles, nous sÃ©parerons ces derniÃ¨res en trois catÃ©gories Ã  savoir : les attaques passives (Ã©coutes), les attaques actives (modifications) et les attaques serveur (sur les Directory Authorities) \cite{ref14}.
+\subsubsection{Attaques passives} Ces attaques sont liÃ©es Ã  l'Ã©coute de messages ou de trafics. Lorsqu'un individu Ã©coute les connexions Ã©tablies par un utilisateur, il lui est dans un premier temps impossible de faire correspondre les messages qui sont envoyÃ©s par cet utilisateur aprÃ¨s le premier noeud. Cela l'empÃªche alors de connaÃ®tre les messages transmis. Malheureusement, les messages Ã©changÃ©s avec un serveur web gardent gÃ©nÃ©ralement une trace de l'utilisateur. Ce sont ces donnÃ©es (contenues au sein des messages Ã©changÃ©s) qui vont permettre Ã  l'attaquant de faire correspondre les messages. Il est donc vivement conseillÃ© de supprimer les donnÃ©es concernant l'utilisateur au sein des messages mais Ã©galement d'utiliser des connexions sÃ©curisÃ©es entre le dernier noeud et le serveur afin de ne pas compromettre l'anonymat de l'utilisateur.
+\subsubsection{Attaques actives} Les attaques actives, quant Ã  elles, reprÃ©sentent une action rÃ©elle de l'attaquant ne se limitant plus Ã  de simples Ã©coutes. Les deux attaques dÃ©crites seront directement basÃ©es sur l'utilisation des noeuds de sortie. La premiÃ¨re consiste Ã  utiliser ces derniers comme protection. En effet, l'ensemble du trafic sortant d'un noeud de sortie lui est attribuÃ©. L'administrateur pourrait donc Ãªtre tenu responsable du trafic illÃ©gal passant par son noeud de sortie. La seconde attaque quant Ã  elle repose sur la crÃ©ation de plusieurs noeuds espions. Il faut alors persuader les serveurs qu'il s'agit d'un noeud sÃ©curisÃ©. Dans ce dernier cas, plus l'attaquant arrivera Ã  ajouter des noeuds, plus il sera capable de contrÃ´ler le trafic d'un utilisateur.  Il est donc primordial de vÃ©rifier la validitÃ© des noeuds insÃ©rÃ©s sur le rÃ©seau.
+\subsubsection{Attaques des Directory Authorities} Il existe une derniÃ¨re catÃ©gorie d'attaques beaucoup moins rÃ©pandues Ã©tant donnÃ© leur niveau de difficultÃ©. Ces derniÃ¨res portent directement sur les serveurs regroupant la liste des noeuds accessibles. Dans ce type d'attaque, le but est de faire croire aux serveurs qu'un noeud hostile est tout Ã  fait fiable. Lorsque plus de la moitiÃ© des serveurs ont contrÃ´lÃ© un noeud, ce noeud est considÃ©rÃ© comme valide, si un attaquant parvient Ã  prendre le contrÃ´le de plus de la moitiÃ© des serveurs, il sera donc Ã©galement capable d'insÃ©rer autant de noeuds hostiles qu'il souhaite. \\
+
+\noindent MalgrÃ© le grand nombre d'attaques existantes, le rÃ©seau Tor reste toutefois l'un des rÃ©seaux garantissant le plus haut niveau d'anonymat aux utilisateurs.
 
 
-\section{Implémentation}
-Comme expliqué à plusieurs reprises dans ce rapport, un projet a réellement été implémenté afin de comprendre concrètement les techniques utilisées dans le réseau Tor. L'architecture de ce projet reprend réellement l'idée du réseau Tor et permet de se faire une idée réelle de la manière dont les concepteurs ont imaginé ce projet. L'implémentation fournie en complément consistait en la réalisation d'une messagerie instantanée entre deux utilisateurs. Afin de pouvoir réaliser de la meilleur façon possible les tests, le projet s'exécute à l'heure actuelle en local. Cependant, il est tout à fait possible de changer les adresses de connexion afin de pouvoir l'exécuter sur plusieurs périphériques. Afin de pouvoir utiliser le réseau, il faut lancer au minimum (et dans l'ordre) un serveur principal permettant de récupérer les informations de connexion, trois noeuds (ou plus) permettant de jouer le rôle de passerelles et deux clients. Il est évident que le projet peut être amélioré ou complexifié, toutefois il représente à l'heure actuelle une schématisation idéale du réseau et peut être utilisé comme illustration des différents concepts évoqués ci-dessus. L'ensemble du projet a été réalisé en Java et peut donc être porté sur toute machine ayant le système installé. Le choix du langage, bien que lourd et pas forcément optimisé, a été encouragé par l'ensemble des possibilités offertes. En effet, Java est un langage offrant un certain nombre de facilités lors de l'échange de messages. A titre d'exemple, le transfert de messages est optimisé puisqu'il est possible à travers un socket de faire passer tout type d'objet. On est donc capable de transmettre des informations formatées et de les récupérer facilement. Il est évident que d'autres langages auraient pu être tout aussi compétitifs. 
+\section{ImplÃ©mentation}
+Un programme de messagerie a Ã©galement Ã©tÃ© implÃ©mentÃ© afin de comprendre les techniques utilisÃ©es dans le rÃ©seau Tor. L'architecture de ce projet reprend l'idÃ©e du rÃ©seau et permet d'en visualiser les diffÃ©rents concepts. La messagerie a pour le moment Ã©tÃ© configurÃ©e pour deux utilisateurs locaux. Cependant, il est tout Ã  fait possible de changer les adresses de connexion afin de pouvoir l'exÃ©cuter sur plusieurs pÃ©riphÃ©riques. Afin de pouvoir utiliser la messagerie, il faut lancer au minimum (et dans l'ordre) un serveur principal permettant de rÃ©cupÃ©rer les informations de connexions, trois noeuds (ou plus) permettant de jouer le rÃ´le de passerelles et, pour finir, deux clients. Il est Ã©vident que le projet aurait pu Ãªtre amÃ©liorÃ© ou complexifiÃ©. Cependant, il reprÃ©sente une schÃ©matisation idÃ©ale du rÃ©seau et peut Ãªtre utilisÃ© comme illustration des diffÃ©rents concepts Ã©voquÃ©s ci-dessus. Les diffÃ©rents programmes utiles ont Ã©tÃ© rÃ©alisÃ©s en Java. Ils peuvent donc Ãªtre portÃ©s sur toute machine disposant de Java. Le choix du langage a Ã©tÃ© encouragÃ© par l'ensemble de ses possibilitÃ©s en matiÃ¨re de communications rÃ©seau. En effet, Java est un langage offrant un certain nombre de facilitÃ©s lors de l'Ã©change de messages. Il est Ã©vident que d'autres langages auraient pu Ãªtre tout aussi pertinents. 
 
 
-\section{Aspect social}
-Tor est un sujet récurrent et  omniprésent dans les médias. Sa popularité est souvent liée à des histoires ayant un lien direct avec la justice. Ma volonté première était de montrer les capacités ainsi que les technologies qui ont été mises en ouvre pour développer ce réseau. Tor est l'un des réseaux les plus sécurisés disponible pour le grand publique. Ce dernier permet également à certains défenseurs des droits de l'homme, de la liberté d'expression ou de toute autre forme de liberté de pouvoir s'exprimer mais également de pouvoir communiquer à travers une plateforme ne subissant aucune forme de censure. Il joue donc encore à l'heure actuelle un rôle important dans la politique de certains pays. Plusieurs groupes ou associations ont donc pour but de maintenir en place ce réseau. Parmi eux, on compte notamment le groupe d'activistes Anonymous ou encore l'association Nos oignons.
-
+\section{Aspects sociaux}
+Ma volontÃ© premiÃ¨re, lors du choix de ce sujet, Ã©tait de mettre en avant les diffÃ©rents aspects techniques de Tor. Il est Ã©galement courant d'entendre parler de ce rÃ©seau dans le cadre d'affaires judiciaires. Je trouvais aussi important de relever les aspects politiques et sociaux que Tor pouvait abonder. L'anonymisation des connexions permet effectivement l'accÃ¨s Ã  divers mÃ©dias libres et indÃ©pendants dans certains pays qui appliquent la censure. Outre les nombreux journalistes utilisant la plateforme, bon nombre de dÃ©fenseurs des droits humains utilisent Ã©galement le rÃ©seau pour pouvoir communiquer de maniÃ¨re anonyme dans leur pays. Encore Ã  l'heure actuelle, Tor joue un rÃ´le socio-politique majeur dans certaines rÃ©gions du monde.
 
 \section{Conclusion}
-Ce document permet donc de mettre en lumière les techniques utilisées au sein de Tor afin de sécuriser de protéger les données utilisateur. Pour ce faire, l'utilisation de noeuds intermédiaires est indispensable et permet de bloquer certains traqueurs visant à suivre un paquet selon sa destination. Parallèlement à cet aspect, chaque message transitant par le réseau est équipé d'une sécurité de haut niveau ne permettant pas à une personne qui souhaiterait accéder au contenu échanger de le faire. Comme dit précédemment, l'utilisation d'un tel système permet donc de garantir l'accès à la liberté d'expression et l'utilisation d'internet de manière absolue. Cependant, le réseau possède bel et bien certaines failles. En effet, comme nous l'avons vu, chaque information transitant via le réseau est chiffré à l'exception des données arrivant auprès du serveur destinataire qui lui est normalement capable de comprendre les requêtes. C'est pourquoi, une identification auprès d'un site internet ou autre supprimerait, toute garantie de sécurité et de confidentialité. Dans le contexte actuel, l'anonymat proposé par ce réseau est un point extrêmement important et c'est probablement ce point qui lui vaut son succès croissant. Nous pouvons donc conclure que le réseau détaillé dans ce document, est un système extrêmement complexe et basé sur une association de techniques parfois opposées mais pouvant être associées afin d'optimiser et d'accroître la sécurité.
+Ce document permet de mettre en lumiÃ¨re les techniques utilisÃ©es au sein de Tor afin d'anonymiser les connexions et les requÃªtes des utilisateurs. Pour ce faire, l'utilisation de noeuds intermÃ©diaires est indispensable. Ces derniers permettent en effet de modifier l'aspect du message Ã  chaque Ã©tape. La modification de l'aspect du message le rend alors pratiquement intraÃ§able. Les utilisateurs doivent Ã©galement veiller Ã  ne pas laisser de traces au sein des messages ce qui rendrait malheureusement le systÃ¨me inefficace. Dans le contexte actuel, l'anonymat proposÃ© par ce rÃ©seau est un facteur extrÃªmement important et c'est probablement cet aspect qui lui vaut son succÃ¨s croissant. On conclura ce document en indiquant que la robustesse du rÃ©seau Tor repose sur plusieurs techniques de cryptographie combinÃ©es afin de tirer le meilleur parti de chacune d'entre elles. 
 
-\bibliographystyle{unsrt} % Le style est mis entre accolades.
-\bibliography{/Users/nathan/Documents/BA3/INFOF308/TOR/Rapport/references.bib} % mon fichier de base de données s'appelle bibli.bib
+\bibliographystyle{unsrt}
+\bibliography{/Users/nathan/Documents/BA3/INFOF308/TOR/Rapport/references.bib} 
 
-%\section{Sources}
-%\noindent
-%\url{https://blog.imirhil.fr/2015/09/22/installer-noeud-tor.html} \\ \\ 
-%\url{http://igm.univ-mlv.fr/~dr/XPOSE2009/TOR/fonctionnement.html} \\ \\
-%\url{https://www.torproject.org/docs/} \\ \\
-%\url{http://jordan-wright.com/blog/2015/02/28/how-tor-works-part-one/} \\ \\
-%\url{https://fr.wikipedia.org/wiki/Cryptographie_symetrique} \\ \\
-%\url{http://www.nymphomath.ch/crypto/rsa/index.html}  \\ \\
-%\url{https://gitweb.torproject.org/torspec.git/tree/tor-spec.txt}
 \end{document}
 
 

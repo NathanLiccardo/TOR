@@ -30,9 +30,7 @@ public class CryptedModel {
     
     public void action(Cipher cipher) {
         try {
-            System.out.println("Size1 : "+_array.length);
             _array = cipher.doFinal(_array);
-            System.out.println("Size2 : "+_array.length);
         } catch (IllegalBlockSizeException | BadPaddingException ex) {
             System.err.println(ex);
         }

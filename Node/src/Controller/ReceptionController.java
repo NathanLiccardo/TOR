@@ -15,7 +15,7 @@ import java.net.Socket;
 import Utils.ReceiveUtils;
 import Utils.SendUtils;
 import Model.NodeModel;
-import java.security.Key;
+import java.security.PrivateKey;
 import javax.crypto.SecretKey;
 
 /**
@@ -24,7 +24,7 @@ import javax.crypto.SecretKey;
  */
 public class ReceptionController implements Runnable{
     private Socket _socket;
-    private final Key _key;
+    private final PrivateKey _key;
     private ServerSocket _server;
     
     @Override
@@ -43,7 +43,7 @@ public class ReceptionController implements Runnable{
         }
     }
     
-    public ReceptionController(int Lport, InetAddress Laddress, Key k){
+    public ReceptionController(int Lport, InetAddress Laddress, PrivateKey k){
         _key = k;
         try {
             _server = new ServerSocket(Lport, 100,Laddress);
@@ -54,7 +54,7 @@ public class ReceptionController implements Runnable{
 }
 
 class Reception implements Runnable {
-    private final Key _key;
+    private final PrivateKey _key;
     private NodeModel _nextNode;
     private MessageModel _message;
     private SecretKey _secretKey;
@@ -67,6 +67,8 @@ class Reception implements Runnable {
     
     private void openCommunication() {
         Socket socket = null;
+        System.out.println(_nextNode.getIp());
+        System.out.println(_nextNode.getPort());
         try {
             socket = new Socket(_nextNode.getIp(),_nextNode.getPort());
         } catch (IOException ex) {
@@ -87,7 +89,6 @@ class Reception implements Runnable {
     
     private void getKey() {
         _message = _receiveMessage.receiveMessage();
-        System.out.print(_message.getNum());
         _decryption.setValues(_message.getMessage(), _key);
         _message = _decryption.decrypt(false);
         _secretKey = (SecretKey) SerializationUtils.deserialize(_message.getKey());
@@ -128,7 +129,7 @@ class Reception implements Runnable {
         closeSocket();
     }
     
-    public Reception(Socket s, Key k) throws IOException, InterruptedException{
+    public Reception(Socket s, PrivateKey k) throws IOException, InterruptedException{
         _key = k;
         _socket = s;
         _sendMessage = null;

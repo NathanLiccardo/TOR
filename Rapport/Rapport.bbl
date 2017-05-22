@@ -55,4 +55,14 @@ Houda FERRADI.
   (aes), Fevrier 2016.
 \newblock \url{http://www.di.ens.fr/~ferradi/coursAES.pdf}.
 
+\bibitem{ref11}
+Marc~O Morain, Vladislav Titov, and Wendy Verbuggen.
+\newblock Onion routing for anonymous communications.
+\newblock \url{http://ctvr.tcd.ie/undergrad/4ba2.05/group10/index.html#8}.
+
+\bibitem{ref14}
+Brieuc Barthélemy.
+\newblock L’anonymat dans le réseau tor (the second-generation onion), 2016.
+\newblock \url{https://brieuc.be/labs/Umons-Tor/Umons-Tor.pdf}.
+
 \end{thebibliography}
